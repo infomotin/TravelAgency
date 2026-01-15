@@ -31,6 +31,15 @@ class InitialPermissionSeeder extends Seeder
             ['name' => 'Security Create', 'slug' => 'security.create'],
             ['name' => 'Security Update', 'slug' => 'security.update'],
             ['name' => 'Security Delete', 'slug' => 'security.delete'],
+            ['name' => 'Accounts View', 'slug' => 'accounts.view'],
+            ['name' => 'Accounts Create', 'slug' => 'accounts.create'],
+            ['name' => 'Accounts Update', 'slug' => 'accounts.update'],
+            ['name' => 'Accounts Delete', 'slug' => 'accounts.delete'],
+            ['name' => 'Transactions View', 'slug' => 'transactions.view'],
+            ['name' => 'Transactions Create', 'slug' => 'transactions.create'],
+            ['name' => 'Transactions Update', 'slug' => 'transactions.update'],
+            ['name' => 'Transactions Delete', 'slug' => 'transactions.delete'],
+            ['name' => 'Accounting Reports View', 'slug' => 'accounting_reports.view'],
         ];
 
         foreach ($permissions as $data) {

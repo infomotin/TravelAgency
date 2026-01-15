@@ -42,6 +42,7 @@ class InitialAgencyAndAdminSeeder extends Seeder
             [
                 'agency_id' => $agency->id,
                 'name' => 'System Administrator',
+                'status' => 'active',
                 'password' => Hash::make('Admin@12345'),
                 'meta' => [
                     'is_seeded_admin' => true,

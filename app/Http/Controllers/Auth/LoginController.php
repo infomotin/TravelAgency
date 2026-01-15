@@ -30,7 +30,11 @@ class LoginController extends Controller
                 'user_agent' => $request->userAgent(),
                 'status' => $status,
             ]);
-            return redirect()->intended('/admin');
+            $user = Auth::user();
+            if ($user && method_exists($user, 'hasRole') && $user->hasRole('admin')) {
+                return redirect()->intended(route('admin.dashboard'));
+            }
+            return redirect()->intended(route('agency.dashboard'));
         }
         LoginActivity::create([
             'user_id' => null,

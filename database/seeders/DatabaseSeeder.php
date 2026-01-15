@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             InitialPermissionSeeder::class,
             InitialAgencyAndAdminSeeder::class,
+            AccountSeeder::class,
         ]);
     }
 }
