@@ -11,6 +11,7 @@ class Agency extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'code',
         'name',
         'slug',
         'logo_path',
@@ -37,4 +38,3 @@ class Agency extends Model
         return $this->hasMany(User::class);
     }
 }
-

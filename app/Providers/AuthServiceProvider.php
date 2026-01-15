@@ -10,8 +10,10 @@ class AuthServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::before(function ($user, string $ability) {
-            if (method_exists($user, 'hasPermission')) {
-                return $user->hasPermission($ability);
+            if (str_contains($ability, '.') && method_exists($user, 'hasPermission')) {
+                if ($user->hasPermission($ability)) {
+                    return true;
+                }
             }
             return null;
         });
