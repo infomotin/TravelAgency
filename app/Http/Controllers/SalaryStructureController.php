@@ -8,6 +8,12 @@ use Illuminate\Http\Request;
 
 class SalaryStructureController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:payroll.view')->only(['index']);
+        $this->middleware('permission:payroll.update')->only(['edit', 'update']);
+    }
+
     public function index()
     {
         $structures = SalaryStructure::with('employee')
@@ -48,4 +54,3 @@ class SalaryStructureController extends Controller
         return redirect()->route('payroll.salary_structures.index');
     }
 }
-

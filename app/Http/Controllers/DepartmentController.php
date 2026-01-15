@@ -7,6 +7,14 @@ use Illuminate\Http\Request;
 
 class DepartmentController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:hr_setup.view')->only(['index']);
+        $this->middleware('permission:hr_setup.create')->only(['create', 'store']);
+        $this->middleware('permission:hr_setup.update')->only(['edit', 'update']);
+        $this->middleware('permission:hr_setup.delete')->only(['destroy']);
+    }
+
     public function index()
     {
         $departments = Department::where('agency_id', app('currentAgency')->id)

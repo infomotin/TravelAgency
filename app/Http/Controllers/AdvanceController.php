@@ -8,6 +8,13 @@ use Illuminate\Http\Request;
 
 class AdvanceController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:payroll.view')->only(['index']);
+        $this->middleware('permission:payroll.create')->only(['create', 'store']);
+        $this->middleware('permission:payroll.delete')->only(['destroy']);
+    }
+
     public function index()
     {
         $advances = Advance::with('employee')
@@ -47,4 +54,3 @@ class AdvanceController extends Controller
         return redirect()->route('payroll.advances.index');
     }
 }
-

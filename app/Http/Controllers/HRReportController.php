@@ -11,6 +11,11 @@ use Illuminate\Http\Request;
 
 class HRReportController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:hr_reports.view');
+    }
+
     public function employeeSummary(Request $request)
     {
         $agencyId = app('currentAgency')->id;

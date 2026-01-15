@@ -32,17 +32,36 @@
                     {{ app('currentAgency')->name ?? 'Agency' }}
                 </div>
                 <a href="{{ route('admin.dashboard') }}" class="list-group-item list-group-item-action">Dashboard</a>
+                @can('view-agencies')
                 <a href="{{ route('agencies.index') }}" class="list-group-item list-group-item-action">Agencies</a>
+                @endcan
+                @can('view-employees')
                 <a href="{{ route('employees.index') }}" class="list-group-item list-group-item-action">Employees</a>
+                @endcan
+                @can('view-security')
+                <div class="list-group-item text-muted fw-semibold">Security</div>
+                <a href="{{ route('roles.index') }}" class="list-group-item list-group-item-action ps-4">Roles</a>
+                <a href="{{ route('permissions.index') }}" class="list-group-item list-group-item-action ps-4">Permissions</a>
+                @endcan
+                @can('view-payroll')
+                <div class="list-group-item text-muted fw-semibold">Payroll</div>
+                <a href="{{ route('payroll.salary_structures.index') }}" class="list-group-item list-group-item-action ps-4">Salary Structures</a>
+                <a href="{{ route('payroll.advances.index') }}" class="list-group-item list-group-item-action ps-4">Advances</a>
+                <a href="{{ route('payroll.payslips.index') }}" class="list-group-item list-group-item-action ps-4">Payslips</a>
+                @endcan
+                @can('view-hr-setup')
                 <div class="list-group-item text-muted fw-semibold">HR Setup</div>
                 <a href="{{ route('departments.index') }}" class="list-group-item list-group-item-action ps-4">Departments</a>
                 <a href="{{ route('designations.index') }}" class="list-group-item list-group-item-action ps-4">Designations</a>
                 <a href="{{ route('shifts.index') }}" class="list-group-item list-group-item-action ps-4">Shifts</a>
                 <a href="{{ route('leave_policies.index') }}" class="list-group-item list-group-item-action ps-4">Leave Policies</a>
+                @endcan
+                @can('view-hr-reports')
                 <div class="list-group-item text-muted fw-semibold">HR Reports</div>
                 <a href="{{ route('hr_reports.employees') }}" class="list-group-item list-group-item-action ps-4">Employee Summary</a>
                 <a href="{{ route('hr_reports.attendance') }}" class="list-group-item list-group-item-action ps-4">Attendance</a>
                 <a href="{{ route('hr_reports.leaves') }}" class="list-group-item list-group-item-action ps-4">Leaves</a>
+                @endcan
             </div>
         </aside>
         <main class="col-md-10 col-lg-10 py-4">

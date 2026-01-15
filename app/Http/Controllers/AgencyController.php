@@ -8,6 +8,14 @@ use Illuminate\Support\Str;
 
 class AgencyController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:agencies.view')->only(['index', 'show']);
+        $this->middleware('permission:agencies.create')->only(['create', 'store']);
+        $this->middleware('permission:agencies.update')->only(['edit', 'update']);
+        $this->middleware('permission:agencies.delete')->only(['destroy']);
+    }
+
     public function index()
     {
         $agencies = Agency::orderBy('name')->paginate(20);
@@ -62,4 +70,3 @@ class AgencyController extends Controller
         return redirect()->route('agencies.index');
     }
 }
-

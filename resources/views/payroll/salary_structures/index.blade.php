@@ -26,7 +26,9 @@
                 <td>{{ number_format($structure->overtime_rate_per_hour, 2) }}</td>
                 <td class="text-end">
                     @if($structure->employee)
+                        @can('payroll.update')
                         <a href="{{ route('payroll.salary_structures.edit', $structure->employee) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                        @endcan
                     @endif
                 </td>
             </tr>
@@ -36,4 +38,3 @@
 </div>
 {{ $structures->links() }}
 @endsection
-

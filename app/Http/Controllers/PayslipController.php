@@ -9,6 +9,13 @@ use Illuminate\Http\Request;
 
 class PayslipController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:payroll.view')->only(['index']);
+        $this->middleware('permission:payroll.create')->only(['create', 'store']);
+        $this->middleware('permission:payroll.update')->only(['approve']);
+    }
+
     public function index(Request $request)
     {
         $month = $request->query('month');
@@ -59,4 +66,3 @@ class PayslipController extends Controller
         return back();
     }
 }
-
