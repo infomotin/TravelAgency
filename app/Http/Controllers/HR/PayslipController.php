@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\HR;
 
+use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Models\Payslip;
 use App\Services\PayrollService;
@@ -66,3 +67,4 @@ class PayslipController extends Controller
         return back();
     }
 }
+

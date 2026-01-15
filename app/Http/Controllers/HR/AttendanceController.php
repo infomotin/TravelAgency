@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\HR;
 
+use App\Http\Controllers\Controller;
 use App\Models\AttendanceRecord;
 use App\Models\Employee;
 use App\Models\CalendarDate;
@@ -25,7 +26,7 @@ class AttendanceController extends Controller
         $agencyId = $employee->agency_id;
         $date = $validated['date'];
         $calStatus = CalendarDate::statusFor($agencyId, $date);
-        if (in_array($calStatus, ['HD','GHD','OHD'], true)) {
+        if (in_array($calStatus, ['HD', 'GHD', 'OHD'], true)) {
             $validated['status'] = 'holiday';
             $validated['in_time'] = null;
             $validated['out_time'] = null;

@@ -3,17 +3,18 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AgencyDashboardController;
-use App\Http\Controllers\EmployeeController;
-use App\Http\Controllers\DepartmentController;
-use App\Http\Controllers\DesignationController;
-use App\Http\Controllers\ShiftController;
-use App\Http\Controllers\LeavePolicyController;
-use App\Http\Controllers\HRReportController;
-use App\Http\Controllers\HolidayController;
-use App\Http\Controllers\CalendarController;
-use App\Http\Controllers\SalaryStructureController;
-use App\Http\Controllers\AdvanceController;
-use App\Http\Controllers\PayslipController;
+use App\Http\Controllers\HR\EmployeeController;
+use App\Http\Controllers\HR\DepartmentController;
+use App\Http\Controllers\HR\DesignationController;
+use App\Http\Controllers\HR\ShiftController;
+use App\Http\Controllers\HR\LeavePolicyController;
+use App\Http\Controllers\HR\HRReportController;
+use App\Http\Controllers\HR\HolidayController;
+use App\Http\Controllers\HR\CalendarController;
+use App\Http\Controllers\HR\SalaryStructureController;
+use App\Http\Controllers\HR\AdvanceController;
+use App\Http\Controllers\HR\PayslipController;
+use App\Http\Controllers\HR\EmployeeLeaveController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\AdminUserController;
@@ -51,6 +52,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('designations', DesignationController::class)->except('show');
     Route::resource('shifts', ShiftController::class)->except('show');
     Route::resource('leave_policies', LeavePolicyController::class)->except('show');
+    Route::resource('employee_leaves', EmployeeLeaveController::class)->only(['index','create','store','update','destroy']);
     Route::resource('holidays', HolidayController::class)->except('show');
     Route::get('calendar', [CalendarController::class, 'index'])->name('calendar.index');
     Route::post('calendar/generate', [CalendarController::class, 'generate'])->name('calendar.generate');
@@ -89,3 +91,5 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('admin/users/{user}/password', [AdminUserController::class, 'editPassword'])->name('admin.users.password.edit');
     Route::put('admin/users/{user}/password', [AdminUserController::class, 'updatePassword'])->name('admin.users.password.update');
 });
+
+// Employee self-service leave routes removed; leave application is handled in HR section

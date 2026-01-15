@@ -1,13 +1,19 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\HR;
 
+use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Models\Department;
 use App\Models\Designation;
 use App\Models\Shift;
+use App\Models\User;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class EmployeeController extends Controller
 {
@@ -45,8 +51,6 @@ class EmployeeController extends Controller
             'department_id' => ['nullable', 'exists:departments,id'],
             'designation_id' => ['nullable', 'exists:designations,id'],
             'shift_id' => ['nullable', 'exists:shifts,id'],
-            
-            // Personal
             'father_name' => ['nullable', 'string', 'max:255'],
             'mother_name' => ['nullable', 'string', 'max:255'],
             'dob' => ['nullable', 'date'],
@@ -58,9 +62,7 @@ class EmployeeController extends Controller
             'email' => ['nullable', 'email'],
             'present_address' => ['nullable', 'string'],
             'permanent_address' => ['nullable', 'string'],
-            'photo' => ['nullable', 'image', 'max:2048'], // 2MB Max
-            
-            // Emergency
+            'photo' => ['nullable', 'image', 'max:2048'],
             'emergency_contact_name' => ['nullable', 'string', 'max:255'],
             'emergency_contact_phone' => ['nullable', 'string'],
             'emergency_contact_relation' => ['nullable', 'string'],
@@ -73,6 +75,11 @@ class EmployeeController extends Controller
         }
 
         $employee = Employee::create($validated);
+
+        if (!empty($employee->email)) {
+            $this->ensureEmployeeUserAndRole($employee);
+        }
+
         return redirect()->route('employees.show', $employee);
     }
 
@@ -101,8 +108,6 @@ class EmployeeController extends Controller
             'department_id' => ['nullable', 'exists:departments,id'],
             'designation_id' => ['nullable', 'exists:designations,id'],
             'shift_id' => ['nullable', 'exists:shifts,id'],
-
-            // Personal
             'father_name' => ['nullable', 'string', 'max:255'],
             'mother_name' => ['nullable', 'string', 'max:255'],
             'dob' => ['nullable', 'date'],
@@ -115,8 +120,6 @@ class EmployeeController extends Controller
             'present_address' => ['nullable', 'string'],
             'permanent_address' => ['nullable', 'string'],
             'photo' => ['nullable', 'image', 'max:2048'],
-            
-            // Emergency
             'emergency_contact_name' => ['nullable', 'string', 'max:255'],
             'emergency_contact_phone' => ['nullable', 'string'],
             'emergency_contact_relation' => ['nullable', 'string'],
@@ -133,9 +136,68 @@ class EmployeeController extends Controller
         return redirect()->route('employees.show', $employee);
     }
 
+    protected function ensureEmployeeUserAndRole(Employee $employee): void
+    {
+        $email = $employee->email;
+        if (!$email) {
+            return;
+        }
+
+        $user = User::where('email', $email)->first();
+        $passwordPlain = null;
+
+        if (!$user) {
+            $passwordPlain = Str::random(10);
+            $user = User::create([
+                'agency_id' => $employee->agency_id,
+                'branch_id' => $employee->branch_id,
+                'name' => $employee->name,
+                'email' => $email,
+                'status' => 'active',
+                'password' => Hash::make($passwordPlain),
+            ]);
+        }
+
+        if (!$employee->user_id) {
+            $employee->user_id = $user->id;
+            $employee->save();
+        }
+
+        $role = Role::firstOrCreate(
+            ['slug' => 'employee'],
+            [
+                'name' => 'Employee',
+                'agency_id' => $employee->agency_id,
+            ]
+        );
+
+        $user->roles()->syncWithoutDetaching([$role->id]);
+
+        if ($passwordPlain) {
+            try {
+                $loginUrl = route('login.form');
+                $subject = 'Your Employee Account for TravelAgency ERP';
+                $body = "Dear {$employee->name},\n\n"
+                    . "An account has been created for you in the TravelAgency ERP.\n\n"
+                    . "Login URL: {$loginUrl}\n"
+                    . "Email: {$email}\n"
+                    . "Password: {$passwordPlain}\n\n"
+                    . "Please log in and change your password after first login.\n\n"
+                    . "Regards,\n"
+                    . "TravelAgency HR";
+
+                Mail::raw($body, function ($message) use ($email, $subject) {
+                    $message->to($email)->subject($subject);
+                });
+            } catch (\Throwable $e) {
+            }
+        }
+    }
+
     public function destroy(Employee $employee)
     {
         $employee->delete();
         return redirect()->route('employees.index');
     }
 }
+

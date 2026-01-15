@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\HR;
 
+use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Models\SalaryStructure;
 use Illuminate\Http\Request;
@@ -54,3 +55,4 @@ class SalaryStructureController extends Controller
         return redirect()->route('payroll.salary_structures.index');
     }
 }
+

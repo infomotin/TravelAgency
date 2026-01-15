@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\HR;
 
-use App\Models\Department;
+use App\Http\Controllers\Controller;
+use App\Models\Designation;
 use Illuminate\Http\Request;
 
-class DepartmentController extends Controller
+class DesignationController extends Controller
 {
     public function __construct()
     {
@@ -17,15 +18,15 @@ class DepartmentController extends Controller
 
     public function index()
     {
-        $departments = Department::where('agency_id', app('currentAgency')->id)
+        $designations = Designation::where('agency_id', app('currentAgency')->id)
             ->orderBy('name')
             ->paginate(20);
-        return view('departments.index', compact('departments'));
+        return view('designations.index', compact('designations'));
     }
 
     public function create()
     {
-        return view('departments.create');
+        return view('designations.create');
     }
 
     public function store(Request $request)
@@ -34,28 +35,28 @@ class DepartmentController extends Controller
             'name' => ['required', 'string', 'max:255'],
         ]);
         $validated['agency_id'] = app('currentAgency')->id;
-        Department::create($validated);
-        return redirect()->route('departments.index');
+        Designation::create($validated);
+        return redirect()->route('designations.index');
     }
 
-    public function edit(Department $department)
+    public function edit(Designation $designation)
     {
-        return view('departments.edit', compact('department'));
+        return view('designations.edit', compact('designation'));
     }
 
-    public function update(Request $request, Department $department)
+    public function update(Request $request, Designation $designation)
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
         ]);
-        $department->update($validated);
-        return redirect()->route('departments.index');
+        $designation->update($validated);
+        return redirect()->route('designations.index');
     }
 
-    public function destroy(Department $department)
+    public function destroy(Designation $designation)
     {
-        $department->delete();
-        return redirect()->route('departments.index');
+        $designation->delete();
+        return redirect()->route('designations.index');
     }
 }
 

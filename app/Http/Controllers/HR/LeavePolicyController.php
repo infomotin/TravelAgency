@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\HR;
 
+use App\Http\Controllers\Controller;
 use App\Models\LeavePolicy;
 use Illuminate\Http\Request;
 
@@ -64,3 +65,4 @@ class LeavePolicyController extends Controller
         return redirect()->route('leave_policies.index');
     }
 }
+

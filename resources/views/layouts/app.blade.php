@@ -43,6 +43,11 @@
         .app-sidebar {
             background-color: #ffffff;
             border-right: 1px solid rgba(148,163,184,.4);
+            position: sticky;
+            top: 0;
+            height: calc(100vh - 56px);
+            overflow-y: auto;
+            overflow-x: hidden;
         }
         .app-sidebar .list-group-item {
             background-color: transparent;
@@ -85,6 +90,7 @@
             color: #9ca3af;
             padding-inline: .75rem;
             padding-top: .85rem;
+            cursor: pointer;
         }
         .app-main {
             background: radial-gradient(circle at top left, rgba(191,219,254,.45), #f3f4f6);
@@ -238,43 +244,64 @@
                 </a>
                 @endcan
                 @can('security.view')
-                <div class="list-group-item text-muted fw-semibold section-title">Security</div>
-                <a href="{{ route('admin.users.index') }}" class="list-group-item list-group-item-action ps-4">Users</a>
-                <a href="{{ route('roles.index') }}" class="list-group-item list-group-item-action ps-4">Roles</a>
-                <a href="{{ route('permissions.index') }}" class="list-group-item list-group-item-action ps-4">Permissions</a>
+                <div class="list-group-item text-muted fw-semibold section-title module-toggle" data-module="security">
+                    Security
+                </div>
+                <div class="module-items" data-module="security">
+                    <a href="{{ route('admin.users.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">Users</a>
+                    <a href="{{ route('roles.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('roles.*') ? 'active' : '' }}">Roles</a>
+                    <a href="{{ route('permissions.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('permissions.*') ? 'active' : '' }}">Permissions</a>
+                </div>
                 @endcan
                 @can('payroll.view')
-                <div class="list-group-item text-muted fw-semibold section-title">Payroll</div>
-                <a href="{{ route('payroll.salary_structures.index') }}" class="list-group-item list-group-item-action ps-4">Salary Structures</a>
-                <a href="{{ route('payroll.advances.index') }}" class="list-group-item list-group-item-action ps-4">Advances</a>
-                <a href="{{ route('payroll.payslips.index') }}" class="list-group-item list-group-item-action ps-4">Payslips</a>
+                <div class="list-group-item text-muted fw-semibold section-title module-toggle" data-module="payroll">
+                    Payroll
+                </div>
+                <div class="module-items" data-module="payroll">
+                    <a href="{{ route('payroll.salary_structures.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('payroll.salary_structures.*') ? 'active' : '' }}">Salary Structures</a>
+                    <a href="{{ route('payroll.advances.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('payroll.advances.*') ? 'active' : '' }}">Advances</a>
+                    <a href="{{ route('payroll.payslips.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('payroll.payslips.*') ? 'active' : '' }}">Payslips</a>
+                </div>
                 @endcan
                 @can('accounts.view')
-                <div class="list-group-item text-muted fw-semibold section-title">Accounting</div>
-                <a href="{{ route('parties.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('parties.*') ? 'active' : '' }}">Parties</a>
-                <a href="{{ route('accounts.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('accounts.*') ? 'active' : '' }}">Chart of Accounts</a>
-                <a href="{{ route('transactions.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('transactions.*') ? 'active' : '' }}">Transactions</a>
-                <a href="{{ route('bills.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('bills.*') ? 'active' : '' }}">Bills</a>
-                @endcan
-                @can('accounting_reports.view')
-                <a href="{{ route('accounting.reports.ledger') }}" class="list-group-item list-group-item-action ps-4">Ledger</a>
-                <a href="{{ route('accounting.reports.trial_balance') }}" class="list-group-item list-group-item-action ps-4">Trial Balance</a>
-                <a href="{{ route('accounting.reports.profit_loss') }}" class="list-group-item list-group-item-action ps-4">Profit &amp; Loss</a>
+                <div class="list-group-item text-muted fw-semibold section-title module-toggle" data-module="accounting">
+                    Accounting
+                </div>
+                <div class="module-items" data-module="accounting">
+                    <a href="{{ route('parties.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('parties.*') ? 'active' : '' }}">Parties</a>
+                    <a href="{{ route('accounts.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('accounts.*') ? 'active' : '' }}">Chart of Accounts</a>
+                    <a href="{{ route('transactions.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('transactions.*') ? 'active' : '' }}">Transactions</a>
+                    <a href="{{ route('bills.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('bills.*') ? 'active' : '' }}">Bills</a>
+                    @can('accounting_reports.view')
+                    <a href="{{ route('accounting.reports.ledger') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('accounting.reports.ledger') ? 'active' : '' }}">Ledger</a>
+                    <a href="{{ route('accounting.reports.trial_balance') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('accounting.reports.trial_balance') ? 'active' : '' }}">Trial Balance</a>
+                    <a href="{{ route('accounting.reports.profit_loss') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('accounting.reports.profit_loss') ? 'active' : '' }}">Profit &amp; Loss</a>
+                    @endcan
+                </div>
                 @endcan
                 @can('hr_setup.view')
-                <div class="list-group-item text-muted fw-semibold section-title">HR Setup</div>
-                <a href="{{ route('departments.index') }}" class="list-group-item list-group-item-action ps-4">Departments</a>
-                <a href="{{ route('designations.index') }}" class="list-group-item list-group-item-action ps-4">Designations</a>
-                <a href="{{ route('shifts.index') }}" class="list-group-item list-group-item-action ps-4">Shifts</a>
-                <a href="{{ route('leave_policies.index') }}" class="list-group-item list-group-item-action ps-4">Leave Policies</a>
-                <a href="{{ route('holidays.index') }}" class="list-group-item list-group-item-action ps-4">Holidays</a>
-                <a href="{{ route('calendar.index') }}" class="list-group-item list-group-item-action ps-4">Calendar</a>
+                <div class="list-group-item text-muted fw-semibold section-title module-toggle" data-module="hr-setup">
+                    HR Setup
+                </div>
+                <div class="module-items" data-module="hr-setup">
+                    <a href="{{ route('departments.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('departments.*') ? 'active' : '' }}">Departments</a>
+                    <a href="{{ route('designations.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('designations.*') ? 'active' : '' }}">Designations</a>
+                    <a href="{{ route('shifts.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('shifts.*') ? 'active' : '' }}">Shifts</a>
+                    <a href="{{ route('leave_policies.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('leave_policies.*') ? 'active' : '' }}">Leave Policies</a>
+                    <a href="{{ route('holidays.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('holidays.*') ? 'active' : '' }}">Holidays</a>
+                    <a href="{{ route('calendar.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('calendar.*') ? 'active' : '' }}">Calendar</a>
+                </div>
                 @endcan
                 @can('hr_reports.view')
-                <div class="list-group-item text-muted fw-semibold section-title">HR Reports</div>
-                <a href="{{ route('hr_reports.employees') }}" class="list-group-item list-group-item-action ps-4">Employee Summary</a>
-                <a href="{{ route('hr_reports.attendance') }}" class="list-group-item list-group-item-action ps-4">Attendance</a>
-                <a href="{{ route('hr_reports.leaves') }}" class="list-group-item list-group-item-action ps-4">Leaves</a>
+                <div class="list-group-item text-muted fw-semibold section-title module-toggle" data-module="hr-reports">
+                    HR
+                </div>
+                <div class="module-items" data-module="hr-reports">
+                    <a href="{{ route('hr_reports.employees') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('hr_reports.employees') ? 'active' : '' }}">Employee Summary</a>
+                    <a href="{{ route('hr_reports.attendance') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('hr_reports.attendance') ? 'active' : '' }}">Attendance</a>
+                    <a href="{{ route('employee_leaves.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('employee_leaves.*') ? 'active' : '' }}">Leave Applications</a>
+                    <a href="{{ route('hr_reports.leaves') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('hr_reports.leaves') ? 'active' : '' }}">Leave Report</a>
+                </div>
                 @endcan
             </div>
         </aside>
@@ -298,6 +325,30 @@
                 order: [],
                 lengthChange: true
             });
+        });
+
+        $('.module-items').hide();
+
+        var initialModule = null;
+        $('.module-items').each(function () {
+            if ($(this).find('.active').length) {
+                initialModule = $(this).data('module');
+            }
+        });
+
+        if (initialModule) {
+            $('.module-items[data-module="' + initialModule + '"]').show();
+        }
+
+        $('.module-toggle').on('click', function () {
+            var module = $(this).data('module');
+
+            if ($('.module-items[data-module="' + module + '"]').is(':visible')) {
+                $('.module-items[data-module="' + module + '"]').slideUp(150);
+            } else {
+                $('.module-items').slideUp(150);
+                $('.module-items[data-module="' + module + '"]').slideDown(150);
+            }
         });
     });
 </script>

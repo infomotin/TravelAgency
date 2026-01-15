@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\HR;
 
+use App\Http\Controllers\Controller;
 use App\Models\Advance;
 use App\Models\Employee;
 use Illuminate\Http\Request;
@@ -54,3 +55,4 @@ class AdvanceController extends Controller
         return redirect()->route('payroll.advances.index');
     }
 }
+

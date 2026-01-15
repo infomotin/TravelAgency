@@ -15,7 +15,9 @@ class EmployeeLeave extends Model
         'leave_policy_id',
         'start_date',
         'end_date',
+        'days',
         'reason',
+        'attachment_path',
         'status',
     ];
 

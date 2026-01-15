@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\HR;
 
+use App\Http\Controllers\Controller;
 use App\Models\Shift;
 use Illuminate\Http\Request;
 
@@ -64,3 +65,4 @@ class ShiftController extends Controller
         return redirect()->route('shifts.index');
     }
 }
+

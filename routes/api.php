@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\AttendanceController;
-use App\Http\Controllers\PayrollController;
+use App\Http\Controllers\HR\AttendanceController;
+use App\Http\Controllers\HR\PayrollController;
 use App\Http\Controllers\TicketController;
 use Illuminate\Support\Facades\Route;
 

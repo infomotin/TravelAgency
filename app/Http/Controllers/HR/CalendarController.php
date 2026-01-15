@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\HR;
 
+use App\Http\Controllers\Controller;
 use App\Models\CalendarDate;
 use App\Models\Holiday;
 use Illuminate\Http\Request;
@@ -47,7 +48,7 @@ class CalendarController extends Controller
             'weekly_day' => ['required', 'in:sunday,monday,tuesday,wednesday,thursday,friday,saturday'],
         ]);
         $year = $validated['year'];
-        $weeklyDay = $validated['weekly_day']; // e.g., 'friday'
+        $weeklyDay = $validated['weekly_day'];
 
         $start = Carbon::create($year, 1, 1);
         $end = Carbon::create($year, 12, 31);
@@ -70,7 +71,7 @@ class CalendarController extends Controller
             $cursor = $start->copy();
             while ($cursor->lte($end)) {
                 $status = 'WD';
-                $isoDow = strtolower($cursor->format('l')); // 'monday'...'sunday'
+                $isoDow = strtolower($cursor->format('l'));
                 $dateStr = $cursor->toDateString();
 
                 if (in_array($dateStr, $ghd, true)) {
