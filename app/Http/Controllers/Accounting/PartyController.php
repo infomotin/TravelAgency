@@ -8,14 +8,6 @@ use Illuminate\Http\Request;
 
 class PartyController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('permission:parties.view')->only(['index', 'show']);
-        $this->middleware('permission:parties.create')->only(['create', 'store']);
-        $this->middleware('permission:parties.update')->only(['edit', 'update']);
-        $this->middleware('permission:parties.delete')->only(['destroy']);
-    }
-
     public function index()
     {
         $parties = Party::where('agency_id', app('currentAgency')->id)

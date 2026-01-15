@@ -71,7 +71,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('payroll/payslips/{payslip}/approve', [PayslipController::class, 'approve'])->name('payroll.payslips.approve');
     Route::resource('accounts', AccountingAccountController::class)->except('show');
     Route::resource('transactions', AccountingTransactionController::class);
-    Route::resource('parties', \App\Http\Controllers\Accounting\PartyController::class);
     Route::resource('bills', BillController::class);
     Route::get('bills/{bill}/pay', [BillController::class, 'payForm'])->name('bills.pay');
     Route::post('bills/{bill}/pay', [BillController::class, 'storePayment'])->name('bills.pay.store');
@@ -104,6 +103,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::delete('passport-attachments/{attachment}', [PassportController::class, 'destroyAttachment'])->name('passport_attachments.destroy');
     Route::get('passports/{passport}/invoice', [PassportController::class, 'invoice'])->name('passports.invoice');
     Route::get('passports/{passport}/barcode', [PassportController::class, 'barcode'])->name('passports.barcode');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::resource('parties', \App\Http\Controllers\Accounting\PartyController::class);
 });
 
 // Employee self-service leave routes removed; leave application is handled in HR section
