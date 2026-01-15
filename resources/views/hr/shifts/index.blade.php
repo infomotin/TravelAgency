@@ -6,7 +6,7 @@
     @can('hr_setup.create')
     <a href="{{ route('shifts.create') }}" class="btn btn-primary">Add Shift</a>
     @endcan
-></div>
+</div>
 <div class="table-responsive">
     <table class="table table-striped align-middle">
         <thead>
@@ -16,8 +16,8 @@
             <th>End</th>
             <th>Grace (min)</th>
             <th></th>
-        ></tr>
-        ></thead>
+        </tr>
+        </thead>
         <tbody>
         @foreach($shifts as $shift)
             <tr>
@@ -34,14 +34,13 @@
                         @csrf
                         @method('DELETE')
                         <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this shift?')">Delete</button>
-                    ></form>
+                    </form>
                     @endcan
-                ></td>
-            ></tr>
+                </td>
+            </tr>
         @endforeach
-        ></tbody>
-    ></table>
-></div>
+        </tbody>
+    </table>
+</div>
 {{ $shifts->links() }}
 @endsection
-

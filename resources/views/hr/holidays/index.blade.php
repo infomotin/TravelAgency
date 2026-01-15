@@ -8,12 +8,12 @@
             <label class="form-label mb-0 small">Year</label>
             <input type="number" name="year" value="{{ $year }}" class="form-control form-control-sm" style="width: 100px;">
             <button class="btn btn-sm btn-outline-secondary">Go</button>
-        ></form>
+        </form>
         @can('hr_setup.create')
         <a href="{{ route('holidays.create') }}" class="btn btn-primary btn-sm">Add Holiday</a>
         @endcan
-    ></div>
-></div>
+    </div>
+</div>
 <div class="table-responsive">
     <table class="table table-striped align-middle">
         <thead>
@@ -21,8 +21,8 @@
             <th style="width: 130px;">Date</th>
             <th>Name</th>
             <th style="width: 160px;"></th>
-        ></tr>
-        ></thead>
+        </tr>
+        </thead>
         <tbody>
         @foreach($holidays as $holiday)
             <tr>
@@ -37,14 +37,13 @@
                         @csrf
                         @method('DELETE')
                         <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this holiday?')">Delete</button>
-                    ></form>
+                    </form>
                     @endcan
-                ></td>
-            ></tr>
+                </td>
+            </tr>
         @endforeach
-        ></tbody>
-    ></table>
+        </tbody>
+    </table>
 </div>
 {{ $holidays->appends(['year' => $year])->links() }}
 @endsection
-

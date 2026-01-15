@@ -6,7 +6,7 @@
     @can('hr_setup.create')
     <a href="{{ route('leave_policies.create') }}" class="btn btn-primary">Add Policy</a>
     @endcan
-></div>
+</div>
 <div class="table-responsive">
     <table class="table table-striped align-middle">
         <thead>
@@ -15,8 +15,8 @@
             <th>Annual Quota</th>
             <th>Carry Forward</th>
             <th></th>
-        ></tr>
-        ></thead>
+        </tr>
+        </thead>
         <tbody>
         @foreach($policies as $policy)
             <tr>
@@ -32,14 +32,13 @@
                         @csrf
                         @method('DELETE')
                         <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this policy?')">Delete</button>
-                    ></form>
+                    </form>
                     @endcan
-                ></td>
-            ></tr>
+                </td>
+            </tr>
         @endforeach
-        ></tbody>
-    ></table>
-></div>
+        </tbody>
+    </table>
+</div>
 {{ $policies->links() }}
 @endsection
-

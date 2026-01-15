@@ -10,20 +10,20 @@
             @foreach($departments as $department)
                 <option value="{{ $department->id }}" @if(($filters['department_id'] ?? '')==$department->id) selected @endif>{{ $department->name }}</option>
             @endforeach
-        ></select>
-    ></div>
+        </select>
+    </div>
     <div class="col-md-3">
         <label class="form-label">Status</label>
         <select name="status" class="form-select">
             <option value="">All</option>
             <option value="active" @if(($filters['status'] ?? '')==='active') selected @endif>Active</option>
             <option value="inactive" @if(($filters['status'] ?? '')==='inactive') selected @endif>Inactive</option>
-        ></select>
-    ></div>
+        </select>
+    </div>
     <div class="col-md-2 d-flex align-items-end">
         <button class="btn btn-outline-secondary w-100">Filter</button>
-    ></div>
-></form>
+    </div>
+</form>
 <div class="table-responsive">
     <table class="table table-striped align-middle">
         <thead>
@@ -35,8 +35,8 @@
             <th>Shift</th>
             <th>Status</th>
             <th>Joining</th>
-        ></tr>
-        ></thead>
+        </tr>
+        </thead>
         <tbody>
         @foreach($employees as $employee)
             <tr>
@@ -47,11 +47,10 @@
                 <td>{{ $employee->shift->name ?? '' }}</td>
                 <td>{{ $employee->status }}</td>
                 <td>{{ optional($employee->joining_date)->format('Y-m-d') }}</td>
-            ></tr>
+            </tr>
         @endforeach
-        ></tbody>
-    ></table>
+        </tbody>
+    </table>
 </div>
 {{ $employees->links() }}
 @endsection
-

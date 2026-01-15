@@ -9,10 +9,10 @@
             @for($m = 1; $m <= 12; $m++)
                 <option value="{{ $m }}" @selected($m === $month)>{{ \Illuminate\Support\Carbon::create(2000, $m, 1)->format('F') }}</option>
             @endfor
-        ></select>
+        </select>
         <button class="btn btn-sm btn-outline-secondary">Show</button>
-    ></form>
-></div>
+    </form>
+</div>
 
 @if(session('success'))
     <div class="alert alert-success small">{{ session('success') }}</div>
@@ -29,32 +29,32 @@
                 @error('year')
                 <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
-            ></div>
+            </div>
             <div class="col-md-3">
                 <label class="form-label">Weekly Holiday Day</label>
                 <select name="weekly_day" class="form-select form-select-sm @error('weekly_day') is-invalid @enderror">
                     @foreach(['sunday','monday','tuesday','wednesday','thursday','friday','saturday'] as $day)
                         <option value="{{ $day }}">{{ ucfirst($day) }}</option>
                     @endforeach
-                ></select>
+                </select>
                 @error('weekly_day')
                 <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
-            ></div>
+            </div>
             <div class="col-md-7 d-flex align-items-end justify-content-end">
                 <button class="btn btn-primary btn-sm">Generate Year</button>
-            ></div>
-        ></form>
+            </div>
+        </form>
         <div class="small text-muted mt-2">
             Status codes: WD = Working Day, HD = Weekly Holiday, GHD = Government Holiday (Bangladesh), OHD = Other Holiday.
-        ></div>
-    ></div>
+        </div>
+    </div>
 </div>
 
 <div class="card">
     <div class="card-header small fw-semibold">
         {{ \Illuminate\Support\Carbon::create($year, $month, 1)->format('F Y') }}
-    ></div>
+    </div>
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table table-sm mb-0 align-middle">
@@ -65,8 +65,8 @@
                     <th style="width: 120px;">Status</th>
                     <th>Remarks</th>
                     <th style="width: 220px;"></th>
-                ></tr>
-                ></thead>
+                </tr>
+                </thead>
                 <tbody>
                 @forelse($dates as $cd)
                     <tr>
@@ -80,8 +80,8 @@
                                 {{ $cd->status === 'OHD' ? 'text-bg-success' : '' }}
                             ">
                                 {{ $cd->status }}
-                            ></span>
-                        ></td>
+                            </span>
+                        </td>
                         <td>{{ $cd->remarks }}</td>
                         <td class="text-end">
                             @can('hr_setup.update')
@@ -92,22 +92,21 @@
                                     @foreach(['WD','HD','GHD','OHD'] as $st)
                                         <option value="{{ $st }}" @selected($cd->status === $st)>{{ $st }}</option>
                                     @endforeach
-                                ></select>
+                                </select>
                                 <input type="text" name="remarks" value="{{ $cd->remarks }}" class="form-control form-control-sm" placeholder="Remarks" style="width: 200px;">
                                 <button class="btn btn-sm btn-outline-primary">Save</button>
-                            ></form>
+                            </form>
                             @endcan
-                        ></td>
-                    ></tr>
+                        </td>
+                    </tr>
                 @empty
                     <tr>
                         <td colspan="5" class="text-center text-muted small">No records. Generate calendar above.</td>
-                    ></tr>
+                    </tr>
                 @endforelse
-                ></tbody>
-            ></table>
-        ></div>
-    ></div>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 @endsection
-
