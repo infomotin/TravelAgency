@@ -22,6 +22,7 @@ use App\Http\Controllers\Accounting\AccountController as AccountingAccountContro
 use App\Http\Controllers\Accounting\TransactionController as AccountingTransactionController;
 use App\Http\Controllers\Accounting\AccountingReportController;
 use App\Http\Controllers\Accounting\BillController;
+use App\Http\Controllers\PassportController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
@@ -90,6 +91,16 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::put('admin/users/{user}', [AdminUserController::class, 'update'])->name('admin.users.update');
     Route::get('admin/users/{user}/password', [AdminUserController::class, 'editPassword'])->name('admin.users.password.edit');
     Route::put('admin/users/{user}/password', [AdminUserController::class, 'updatePassword'])->name('admin.users.password.update');
+    Route::get('passports/setup', [PassportController::class, 'setup'])->name('passports.setup');
+    Route::post('passports/setup/countries', [PassportController::class, 'storeCountry'])->name('passports.setup.countries.store');
+    Route::post('passports/setup/airports', [PassportController::class, 'storeAirport'])->name('passports.setup.airports.store');
+    Route::post('passports/setup/ticket-agencies', [PassportController::class, 'storeTicketAgency'])->name('passports.setup.ticket_agencies.store');
+    Route::post('passports/setup/currencies', [PassportController::class, 'storeCurrency'])->name('passports.setup.currencies.store');
+    Route::get('passports/report', [PassportController::class, 'report'])->name('passports.report');
+    Route::get('passports/report/pdf', [PassportController::class, 'reportPdf'])->name('passports.report.pdf');
+    Route::resource('passports', PassportController::class);
+    Route::delete('passport-attachments/{attachment}', [PassportController::class, 'destroyAttachment'])->name('passport_attachments.destroy');
+    Route::get('passports/{passport}/barcode', [PassportController::class, 'barcode'])->name('passports.barcode');
 });
 
 // Employee self-service leave routes removed; leave application is handled in HR section
