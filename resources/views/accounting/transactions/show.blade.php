@@ -16,6 +16,10 @@
         <div class="fw-semibold">{{ ucfirst($transaction->type) }}</div>
     </div>
     <div class="col-md-3">
+        <div class="small text-muted">Party</div>
+        <div class="fw-semibold">{{ $transaction->party?->name }}</div>
+    </div>
+    <div class="col-md-3">
         <div class="small text-muted">Reference</div>
         <div class="fw-semibold">{{ $transaction->reference }}</div>
     </div>
@@ -69,4 +73,3 @@
     </div>
 </div>
 @endsection
-

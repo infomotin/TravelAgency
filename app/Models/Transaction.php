@@ -17,6 +17,7 @@ class Transaction extends Model
         'type',
         'description',
         'reference',
+        'party_id',
         'created_by',
         'status'
     ];
@@ -38,5 +39,10 @@ class Transaction extends Model
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function party()
+    {
+        return $this->belongsTo(Party::class);
     }
 }

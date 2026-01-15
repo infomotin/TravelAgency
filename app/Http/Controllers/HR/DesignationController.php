@@ -21,12 +21,12 @@ class DesignationController extends Controller
         $designations = Designation::where('agency_id', app('currentAgency')->id)
             ->orderBy('name')
             ->paginate(20);
-        return view('hr.designations.index', compact('designations'));
+        return view('designations.index', compact('designations'));
     }
 
     public function create()
     {
-        return view('hr.designations.create');
+        return view('designations.create');
     }
 
     public function store(Request $request)
@@ -41,7 +41,7 @@ class DesignationController extends Controller
 
     public function edit(Designation $designation)
     {
-        return view('hr.designations.edit', compact('designation'));
+        return view('designations.edit', compact('designation'));
     }
 
     public function update(Request $request, Designation $designation)

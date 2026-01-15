@@ -20,7 +20,8 @@
                 <tr>
                     <th style="width: 130px;">Voucher No</th>
                     <th style="width: 110px;">Date</th>
-                    <th style="width: 100px;">Type</th>
+                    <th style="width: 110px;">Type</th>
+                    <th style="width: 160px;">Party</th>
                     <th>Description</th>
                     <th style="width: 140px;">Reference</th>
                     <th style="width: 110px;">Status</th>
@@ -33,6 +34,7 @@
                         <td>{{ $transaction->voucher_no }}</td>
                         <td>{{ $transaction->date->format('Y-m-d') }}</td>
                         <td>{{ ucfirst($transaction->type) }}</td>
+                        <td>{{ $transaction->party?->name }}</td>
                         <td>{{ $transaction->description }}</td>
                         <td>{{ $transaction->reference }}</td>
                         <td>{{ ucfirst($transaction->status) }}</td>
@@ -60,4 +62,3 @@
     </div>
 </div>
 @endsection
-

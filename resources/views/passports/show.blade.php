@@ -58,6 +58,22 @@
                     <span class="text-muted">No agent commission</span>
                 @endif
             </dd>
+            <dt class="col-sm-3">Invoice Number</dt>
+            <dd class="col-sm-9">
+                @if($passport->invoice_no)
+                    {{ $passport->invoice_no }}
+                @else
+                    <span class="text-muted">Not generated</span>
+                @endif
+            </dd>
+            <dt class="col-sm-3">Invoice Date</dt>
+            <dd class="col-sm-9">
+                @if($passport->invoice_date)
+                    {{ optional($passport->invoice_date)->format('Y-m-d') }}
+                @else
+                    <span class="text-muted">Not set</span>
+                @endif
+            </dd>
             <dt class="col-sm-3">Document</dt>
             <dd class="col-sm-9">
                 @if($passport->document_path)
@@ -87,6 +103,7 @@
     </div>
     </div>
 <a href="{{ route('passports.edit', $passport) }}" class="btn btn-primary">Edit</a>
+<a href="{{ route('passports.invoice', $passport) }}" class="btn btn-success">Invoice / Receipt</a>
 <a href="{{ route('passports.barcode', $passport) }}" class="btn btn-outline-primary">Barcode</a>
 <a href="{{ route('passports.index') }}" class="btn btn-outline-secondary">Back to list</a>
 @endsection

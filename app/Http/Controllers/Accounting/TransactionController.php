@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Accounting;
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use App\Models\Account;
+use App\Models\Party;
 use Illuminate\Http\Request;
 
 class TransactionController extends Controller
@@ -20,7 +21,7 @@ class TransactionController extends Controller
     public function index()
     {
         $transactions = Transaction::where('agency_id', app('currentAgency')->id)
-            ->with('lines.account', 'creator')
+            ->with('lines.account', 'creator', 'party')
             ->latest('date')
             ->paginate(15);
 
@@ -32,8 +33,12 @@ class TransactionController extends Controller
         $accounts = Account::where('agency_id', app('currentAgency')->id)
             ->orderBy('code')
             ->get();
+        $parties = Party::where('agency_id', app('currentAgency')->id)
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get();
             
-        return view('accounting.transactions.create', compact('accounts'));
+        return view('accounting.transactions.create', compact('accounts', 'parties'));
     }
 
     public function store(Request $request)
@@ -43,6 +48,7 @@ class TransactionController extends Controller
             'type' => 'required|in:payment,receipt,journal,contra',
             'description' => 'nullable|string',
             'reference' => 'nullable|string',
+            'party_id' => 'nullable|exists:parties,id',
             'lines' => 'required|array|min:2',
             'lines.*.account_id' => 'required|exists:accounts,id',
             'lines.*.debit' => 'required|numeric|min:0',
@@ -80,6 +86,7 @@ class TransactionController extends Controller
             'type' => $validated['type'],
             'description' => $validated['description'],
             'reference' => $validated['reference'],
+            'party_id' => $validated['party_id'] ?? null,
             'created_by' => auth()->id(),
             'status' => 'approved',
         ]);
@@ -95,18 +102,22 @@ class TransactionController extends Controller
 
     public function show(Transaction $transaction)
     {
-        $transaction->load('lines.account', 'creator');
+        $transaction->load('lines.account', 'creator', 'party');
         return view('accounting.transactions.show', compact('transaction'));
     }
 
     public function edit(Transaction $transaction)
     {
-        $transaction->load('lines');
+        $transaction->load('lines', 'party');
         $accounts = Account::where('agency_id', app('currentAgency')->id)
             ->orderBy('code')
             ->get();
+        $parties = Party::where('agency_id', app('currentAgency')->id)
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get();
             
-        return view('accounting.transactions.edit', compact('transaction', 'accounts'));
+        return view('accounting.transactions.edit', compact('transaction', 'accounts', 'parties'));
     }
 
     public function update(Request $request, Transaction $transaction)
@@ -116,6 +127,7 @@ class TransactionController extends Controller
             'type' => 'required|in:payment,receipt,journal,contra',
             'description' => 'nullable|string',
             'reference' => 'nullable|string',
+            'party_id' => 'nullable|exists:parties,id',
             'lines' => 'required|array|min:2',
             'lines.*.account_id' => 'required|exists:accounts,id',
             'lines.*.debit' => 'required|numeric|min:0',
@@ -135,6 +147,7 @@ class TransactionController extends Controller
             'type' => $validated['type'],
             'description' => $validated['description'],
             'reference' => $validated['reference'],
+            'party_id' => $validated['party_id'] ?? null,
         ]);
 
         // Delete old lines and re-create (simplest approach)

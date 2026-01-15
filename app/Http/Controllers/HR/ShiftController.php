@@ -21,12 +21,12 @@ class ShiftController extends Controller
         $shifts = Shift::where('agency_id', app('currentAgency')->id)
             ->orderBy('name')
             ->paginate(20);
-        return view('hr.shifts.index', compact('shifts'));
+        return view('shifts.index', compact('shifts'));
     }
 
     public function create()
     {
-        return view('hr.shifts.create');
+        return view('shifts.create');
     }
 
     public function store(Request $request)
@@ -44,7 +44,7 @@ class ShiftController extends Controller
 
     public function edit(Shift $shift)
     {
-        return view('hr.shifts.edit', compact('shift'));
+        return view('shifts.edit', compact('shift'));
     }
 
     public function update(Request $request, Shift $shift)

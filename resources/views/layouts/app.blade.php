@@ -288,6 +288,7 @@
                     <a href="{{ route('passports.setup') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('passports.setup') ? 'active' : '' }}">Passport Setup</a>
                     <a href="{{ route('passports.setup') }}#local-agents" class="list-group-item list-group-item-action ps-4">Local Agent Setup</a>
                     <a href="{{ route('passports.report') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('passports.report') ? 'active' : '' }}">Passport Report</a>
+                    <a href="{{ route('passports.local_agent_report') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('passports.local_agent_report') ? 'active' : '' }}">Local Agent Report</a>
                 </div>
                 @endif
                 @can('hr_setup.view')

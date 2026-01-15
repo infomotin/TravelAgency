@@ -33,6 +33,8 @@ class Passport extends Model
         'local_agent_commission_type',
         'local_agent_commission_value',
         'local_agent_commission_amount',
+        'invoice_no',
+        'invoice_date',
     ];
 
     public function attachments()
@@ -40,4 +42,3 @@ class Passport extends Model
         return $this->hasMany(PassportAttachment::class);
     }
 }
-

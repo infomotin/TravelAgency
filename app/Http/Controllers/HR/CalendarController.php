@@ -33,7 +33,7 @@ class CalendarController extends Controller
             ->orderBy('date')
             ->get();
 
-        return view('hr.calendar.index', [
+        return view('calendar.index', [
             'year' => $year,
             'month' => $month,
             'dates' => $dates,

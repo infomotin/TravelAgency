@@ -30,7 +30,7 @@ class HolidayController extends Controller
 
         $holidays = $query->paginate(30);
 
-        return view('hr.holidays.index', [
+        return view('holidays.index', [
             'holidays' => $holidays,
             'year' => $year,
         ]);
@@ -38,7 +38,7 @@ class HolidayController extends Controller
 
     public function create()
     {
-        return view('hr.holidays.create');
+        return view('holidays.create');
     }
 
     public function store(Request $request)
@@ -57,7 +57,7 @@ class HolidayController extends Controller
 
     public function edit(Holiday $holiday)
     {
-        return view('hr.holidays.edit', [
+        return view('holidays.edit', [
             'holiday' => $holiday,
         ]);
     }

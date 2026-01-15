@@ -28,7 +28,19 @@
                 <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
-            <div class="col-md-6">
+            <div class="col-md-3">
+                <label class="form-label">Party</label>
+                <select name="party_id" class="form-select form-select-sm @error('party_id') is-invalid @enderror">
+                    <option value="">Select party (optional)</option>
+                    @foreach($parties as $party)
+                        <option value="{{ $party->id }}" @selected(old('party_id') == $party->id)>{{ $party->name }}</option>
+                    @endforeach
+                </select>
+                @error('party_id')
+                <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+            <div class="col-md-3">
                 <label class="form-label">Reference</label>
                 <input type="text" name="reference" value="{{ old('reference') }}" class="form-control form-control-sm @error('reference') is-invalid @enderror">
                 @error('reference')
@@ -53,4 +65,3 @@
     </div>
 </div>
 @endsection
-

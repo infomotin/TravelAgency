@@ -187,7 +187,11 @@ class PassportController extends Controller
             $path = $request->file('document')->store('passport_documents', 'public');
         }
 
-        $entryCharge = $validated['is_free'] ? 0 : ($validated['entry_charge'] ?? 0);
+        $entryCharge = $validated['entry_charge'] ?? 0;
+        $isFree = (bool) ($validated['is_free'] ?? false);
+
+        $invoiceNo = $this->generateInvoiceNumber(app('currentAgency')->id);
+        $invoiceDate = now()->toDateString();
 
         $localAgentId = $validated['local_agent_id'] ?? null;
         $commissionType = null;
@@ -231,8 +235,10 @@ class PassportController extends Controller
             'expiry_date' => $validated['expiry_date'],
             'document_path' => $path,
             'entry_charge' => $entryCharge,
+            'invoice_no' => $invoiceNo,
+            'invoice_date' => $invoiceDate,
             'person_commission' => $validated['person_commission'] ?? 0,
-            'is_free' => $validated['is_free'] ?? false,
+            'is_free' => $isFree,
             'purpose' => $validated['purpose'] ?? null,
             'local_agent_name' => $localAgentName,
             'local_agent_commission_type' => $commissionType,
@@ -444,6 +450,59 @@ class PassportController extends Controller
         return $pdf->download($fileName);
     }
 
+    public function localAgentReport(Request $request)
+    {
+        $fromDate = $request->input('from_date', now()->startOfMonth()->toDateString());
+        $toDate = $request->input('to_date', now()->endOfMonth()->toDateString());
+
+        $passports = Passport::where('passports.agency_id', app('currentAgency')->id)
+            ->whereNotNull('passports.local_agent_id')
+            ->whereBetween('passports.created_at', [$fromDate . ' 00:00:00', $toDate . ' 23:59:59'])
+            ->leftJoin('countries', 'passports.country_id', '=', 'countries.id')
+            ->select('passports.*', 'countries.name as country_name')
+            ->orderBy('passports.local_agent_name')
+            ->orderBy('country_name')
+            ->orderBy('passports.created_at')
+            ->get();
+
+        // Group by Local Agent -> Country -> Month
+        $reportData = $passports->groupBy('local_agent_id')->map(function ($agentPassports) {
+            $agentName = $agentPassports->first()->local_agent_name ?? 'Unknown Agent';
+            
+            $byCountry = $agentPassports->groupBy('country_id')->map(function ($countryPassports) {
+                $countryName = $countryPassports->first()->country_name ?? 'Unknown Country';
+                
+                $byMonth = $countryPassports->groupBy(function ($item) {
+                    return \Carbon\Carbon::parse($item->created_at)->format('Y-m');
+                })->map(function ($monthPassports) {
+                    return [
+                        'total_commission' => $monthPassports->sum('local_agent_commission_amount'),
+                        'count' => $monthPassports->count(),
+                    ];
+                });
+
+                return [
+                    'name' => $countryName,
+                    'months' => $byMonth,
+                    'total_commission' => $countryPassports->sum('local_agent_commission_amount'),
+                ];
+            });
+
+            return [
+                'name' => $agentName,
+                'countries' => $byCountry,
+                'total_commission' => $agentPassports->sum('local_agent_commission_amount'),
+            ];
+        });
+
+        if ($request->has('pdf')) {
+            $pdf = Pdf::loadView('passports.local_agent_report_pdf', compact('reportData', 'fromDate', 'toDate'));
+            return $pdf->download('local_agent_commission_report.pdf');
+        }
+
+        return view('passports.local_agent_report', compact('reportData', 'fromDate', 'toDate'));
+    }
+
     public function edit(Passport $passport)
     {
         $this->authorizeAgency($passport);
@@ -491,6 +550,9 @@ class PassportController extends Controller
 
         $path = $passport->document_path;
 
+        $invoiceNo = $passport->invoice_no;
+        $invoiceDate = $passport->invoice_date;
+
         if ($request->hasFile('document')) {
             if ($path) {
                 Storage::disk('public')->delete($path);
@@ -499,7 +561,13 @@ class PassportController extends Controller
             $path = $request->file('document')->store('passport_documents', 'public');
         }
 
-        $entryCharge = $validated['is_free'] ? 0 : ($validated['entry_charge'] ?? 0);
+        $entryCharge = $validated['entry_charge'] ?? 0;
+        $isFree = (bool) ($validated['is_free'] ?? false);
+
+        if (!$invoiceNo) {
+            $invoiceNo = $this->generateInvoiceNumber(app('currentAgency')->id);
+            $invoiceDate = now()->toDateString();
+        }
 
         $localAgentId = $validated['local_agent_id'] ?? null;
         $commissionType = null;
@@ -541,8 +609,10 @@ class PassportController extends Controller
             'expiry_date' => $validated['expiry_date'],
             'document_path' => $path,
             'entry_charge' => $entryCharge,
+            'invoice_no' => $invoiceNo,
+            'invoice_date' => $invoiceDate,
             'person_commission' => $validated['person_commission'] ?? 0,
-            'is_free' => $validated['is_free'] ?? false,
+            'is_free' => $isFree,
             'purpose' => $validated['purpose'] ?? null,
             'local_agent_name' => $localAgentName,
             'local_agent_commission_type' => $commissionType,
@@ -630,5 +700,42 @@ class PassportController extends Controller
         if ($passport->agency_id !== app('currentAgency')->id) {
             abort(404);
         }
+    }
+
+    public function invoice(Passport $passport)
+    {
+        $this->authorizeAgency($passport);
+
+        if (!$passport->invoice_no) {
+            $passport->invoice_no = $this->generateInvoiceNumber(app('currentAgency')->id);
+            $passport->invoice_date = now()->toDateString();
+            $passport->save();
+        }
+
+        return view('passports.invoice', compact('passport'));
+    }
+
+    protected function generateInvoiceNumber(int $agencyId): string
+    {
+        $today = now()->format('Ymd');
+        $prefix = 'INV-' . $today . '-';
+
+        $lastInvoice = DB::table('passports')
+            ->where('agency_id', $agencyId)
+            ->where('invoice_no', 'like', $prefix . '%')
+            ->orderBy('invoice_no', 'desc')
+            ->value('invoice_no');
+
+        $nextNumber = 1;
+
+        if ($lastInvoice) {
+            $parts = explode('-', $lastInvoice);
+            $lastSeq = (int) end($parts);
+            if ($lastSeq > 0) {
+                $nextNumber = $lastSeq + 1;
+            }
+        }
+
+        return $prefix . str_pad((string) $nextNumber, 4, '0', STR_PAD_LEFT);
     }
 }

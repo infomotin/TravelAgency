@@ -22,7 +22,7 @@ class AdvanceController extends Controller
             ->orderByDesc('date')
             ->paginate(20);
 
-        return view('hr.payroll.advances.index', compact('advances'));
+        return view('payroll.advances.index', compact('advances'));
     }
 
     public function create()
@@ -31,7 +31,7 @@ class AdvanceController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('hr.payroll.advances.create', compact('employees'));
+        return view('payroll.advances.create', compact('employees'));
     }
 
     public function store(Request $request)
