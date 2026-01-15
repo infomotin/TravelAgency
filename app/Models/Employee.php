@@ -19,6 +19,21 @@ class Employee extends Model
         'shift_id',
         'employee_code',
         'name',
+        'father_name',
+        'mother_name',
+        'dob',
+        'gender',
+        'marital_status',
+        'blood_group',
+        'nid',
+        'phone',
+        'email',
+        'present_address',
+        'permanent_address',
+        'photo',
+        'emergency_contact_name',
+        'emergency_contact_phone',
+        'emergency_contact_relation',
         'joining_date',
         'probation_end_date',
         'status',
@@ -27,6 +42,7 @@ class Employee extends Model
     protected $casts = [
         'joining_date' => 'date',
         'probation_end_date' => 'date',
+        'dob' => 'date',
     ];
 
     public function agency() { return $this->belongsTo(Agency::class); }

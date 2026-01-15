@@ -70,4 +70,82 @@ class AccountingReportController extends Controller
         
         return view('accounting.reports.trial_balance', compact('data', 'date'));
     }
+
+    public function profitLoss(Request $request)
+    {
+        $period = $request->input('period', 'month');
+        $today = date('Y-m-d');
+        if ($period === 'year') {
+            $from = date('Y-01-01');
+            $to = date('Y-12-31');
+        } else {
+            $from = date('Y-m-01');
+            $to = date('Y-m-t');
+        }
+
+        if ($request->filled('date_from')) {
+            $from = $request->input('date_from');
+        }
+        if ($request->filled('date_to')) {
+            $to = $request->input('date_to');
+        }
+
+        $accounts = Account::where('agency_id', app('currentAgency')->id)
+            ->whereIn('type', ['income', 'expense'])
+            ->with(['lines' => function ($q) use ($from, $to) {
+                $q->whereHas('transaction', function ($t) use ($from, $to) {
+                    $t->whereBetween('date', [$from, $to]);
+                });
+            }])
+            ->orderBy('type')
+            ->orderBy('code')
+            ->get();
+
+        $income = [];
+        $expenses = [];
+        $totalIncome = 0;
+        $totalExpenses = 0;
+
+        foreach ($accounts as $account) {
+            $debit = $account->lines->sum('debit');
+            $credit = $account->lines->sum('credit');
+
+            if ($account->type === 'income') {
+                $net = $credit - $debit;
+                if (abs($net) < 0.01) {
+                    continue;
+                }
+                $income[] = [
+                    'code' => $account->code,
+                    'name' => $account->name,
+                    'amount' => $net,
+                ];
+                $totalIncome += $net;
+            } else {
+                $net = $debit - $credit;
+                if (abs($net) < 0.01) {
+                    continue;
+                }
+                $expenses[] = [
+                    'code' => $account->code,
+                    'name' => $account->name,
+                    'amount' => $net,
+                ];
+                $totalExpenses += $net;
+            }
+        }
+
+        $profit = $totalIncome - $totalExpenses;
+
+        return view('accounting.reports.profit_loss', [
+            'period' => $period,
+            'dateFrom' => $from,
+            'dateTo' => $to,
+            'income' => $income,
+            'expenses' => $expenses,
+            'totalIncome' => $totalIncome,
+            'totalExpenses' => $totalExpenses,
+            'profit' => $profit,
+        ]);
+    }
 }

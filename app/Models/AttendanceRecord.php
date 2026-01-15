@@ -13,6 +13,7 @@ class AttendanceRecord extends Model
     protected $fillable = [
         'employee_id',
         'date',
+        'status',
         'in_time',
         'out_time',
         'late_minutes',
@@ -25,4 +26,3 @@ class AttendanceRecord extends Model
         'date' => 'date',
     ];
 }
-

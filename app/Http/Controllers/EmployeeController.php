@@ -7,6 +7,7 @@ use App\Models\Department;
 use App\Models\Designation;
 use App\Models\Shift;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class EmployeeController extends Controller
 {
@@ -44,8 +45,33 @@ class EmployeeController extends Controller
             'department_id' => ['nullable', 'exists:departments,id'],
             'designation_id' => ['nullable', 'exists:designations,id'],
             'shift_id' => ['nullable', 'exists:shifts,id'],
+            
+            // Personal
+            'father_name' => ['nullable', 'string', 'max:255'],
+            'mother_name' => ['nullable', 'string', 'max:255'],
+            'dob' => ['nullable', 'date'],
+            'gender' => ['nullable', 'string', 'in:Male,Female,Other'],
+            'marital_status' => ['nullable', 'string'],
+            'blood_group' => ['nullable', 'string'],
+            'nid' => ['nullable', 'string'],
+            'phone' => ['nullable', 'string'],
+            'email' => ['nullable', 'email'],
+            'present_address' => ['nullable', 'string'],
+            'permanent_address' => ['nullable', 'string'],
+            'photo' => ['nullable', 'image', 'max:2048'], // 2MB Max
+            
+            // Emergency
+            'emergency_contact_name' => ['nullable', 'string', 'max:255'],
+            'emergency_contact_phone' => ['nullable', 'string'],
+            'emergency_contact_relation' => ['nullable', 'string'],
         ]);
+
         $validated['agency_id'] = app('currentAgency')->id;
+
+        if ($request->hasFile('photo')) {
+            $validated['photo'] = $request->file('photo')->store('employee-photos', 'public');
+        }
+
         $employee = Employee::create($validated);
         return redirect()->route('employees.show', $employee);
     }
@@ -75,7 +101,34 @@ class EmployeeController extends Controller
             'department_id' => ['nullable', 'exists:departments,id'],
             'designation_id' => ['nullable', 'exists:designations,id'],
             'shift_id' => ['nullable', 'exists:shifts,id'],
+
+            // Personal
+            'father_name' => ['nullable', 'string', 'max:255'],
+            'mother_name' => ['nullable', 'string', 'max:255'],
+            'dob' => ['nullable', 'date'],
+            'gender' => ['nullable', 'string', 'in:Male,Female,Other'],
+            'marital_status' => ['nullable', 'string'],
+            'blood_group' => ['nullable', 'string'],
+            'nid' => ['nullable', 'string'],
+            'phone' => ['nullable', 'string'],
+            'email' => ['nullable', 'email'],
+            'present_address' => ['nullable', 'string'],
+            'permanent_address' => ['nullable', 'string'],
+            'photo' => ['nullable', 'image', 'max:2048'],
+            
+            // Emergency
+            'emergency_contact_name' => ['nullable', 'string', 'max:255'],
+            'emergency_contact_phone' => ['nullable', 'string'],
+            'emergency_contact_relation' => ['nullable', 'string'],
         ]);
+
+        if ($request->hasFile('photo')) {
+            if ($employee->photo) {
+                Storage::disk('public')->delete($employee->photo);
+            }
+            $validated['photo'] = $request->file('photo')->store('employee-photos', 'public');
+        }
+
         $employee->update($validated);
         return redirect()->route('employees.show', $employee);
     }

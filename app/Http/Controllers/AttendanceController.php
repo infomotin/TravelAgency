@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AttendanceRecord;
 use App\Models\Employee;
+use App\Models\CalendarDate;
 use Illuminate\Http\Request;
 
 class AttendanceController extends Controller
@@ -20,6 +21,21 @@ class AttendanceController extends Controller
             'source' => ['required', 'in:manual,biometric'],
         ]);
         $validated['employee_id'] = $employee->id;
+
+        $agencyId = $employee->agency_id;
+        $date = $validated['date'];
+        $calStatus = CalendarDate::statusFor($agencyId, $date);
+        if (in_array($calStatus, ['HD','GHD','OHD'], true)) {
+            $validated['status'] = 'holiday';
+            $validated['in_time'] = null;
+            $validated['out_time'] = null;
+            $validated['late_minutes'] = 0;
+            $validated['early_leave_minutes'] = 0;
+            $validated['overtime_minutes'] = 0;
+        } else {
+            $validated['status'] = 'present';
+        }
+
         $record = AttendanceRecord::updateOrCreate(
             ['employee_id' => $employee->id, 'date' => $validated['date']],
             $validated

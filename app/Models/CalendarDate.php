@@ -6,14 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Holiday extends Model
+class CalendarDate extends Model
 {
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'agency_id',
         'date',
-        'name',
+        'status',
+        'remarks',
     ];
 
     protected $casts = [
@@ -25,16 +26,9 @@ class Holiday extends Model
         return $this->belongsTo(Agency::class);
     }
 
-    public static function forAgencyAndDate(int $agencyId, string $date): ?self
+    public static function statusFor(int $agencyId, string $date): ?string
     {
-        return static::where('agency_id', $agencyId)
-            ->whereDate('date', $date)
-            ->first();
-    }
-
-    public static function isHoliday(int $agencyId, string $date): bool
-    {
-        return static::forAgencyAndDate($agencyId, $date) !== null;
+        return static::where('agency_id', $agencyId)->whereDate('date', $date)->value('status');
     }
 }
 

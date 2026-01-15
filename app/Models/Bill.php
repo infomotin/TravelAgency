@@ -12,6 +12,7 @@ class Bill extends Model
 
     protected $fillable = [
         'agency_id',
+        'party_id',
         'bill_no',
         'bill_date',
         'due_date',
@@ -35,6 +36,11 @@ class Bill extends Model
         return $this->belongsTo(Agency::class);
     }
 
+    public function party()
+    {
+        return $this->belongsTo(Party::class);
+    }
+
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
@@ -48,5 +54,10 @@ class Bill extends Model
     public function payments()
     {
         return $this->hasMany(BillPayment::class);
+    }
+
+    public function attachments()
+    {
+        return $this->hasMany(BillAttachment::class);
     }
 }

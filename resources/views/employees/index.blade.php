@@ -8,7 +8,7 @@
     @endcan
 </div>
 <div class="table-responsive">
-    <table class="table table-striped align-middle">
+    <table class="table table-striped align-middle" data-datatable="true">
         <thead>
         <tr>
             <th>Code</th>
@@ -47,5 +47,4 @@
         </tbody>
     </table>
 </div>
-{{ $employees->links() }}
 @endsection
