@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Models\Agency;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Symfony\Component\HttpFoundation\Response;
 
 class SetCurrentAgency
@@ -16,7 +17,7 @@ class SetCurrentAgency
         $slug = $headerSlug ?: explode('.', $host)[0];
         $agency = null;
 
-        if ($slug) {
+        if ($slug && Schema::hasColumn('agencies', 'slug')) {
             $agency = Agency::where('slug', $slug)->first();
         }
 
@@ -29,4 +30,3 @@ class SetCurrentAgency
         return $next($request);
     }
 }
-

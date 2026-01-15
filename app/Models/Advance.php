@@ -6,31 +6,24 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class EmployeeLeave extends Model
+class Advance extends Model
 {
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'employee_id',
-        'leave_policy_id',
-        'start_date',
-        'end_date',
-        'reason',
-        'status',
+        'amount',
+        'date',
+        'note',
     ];
 
     protected $casts = [
-        'start_date' => 'date',
-        'end_date' => 'date',
+        'date' => 'date',
     ];
 
     public function employee()
     {
         return $this->belongsTo(Employee::class);
     }
-
-    public function policy()
-    {
-        return $this->belongsTo(LeavePolicy::class, 'leave_policy_id');
-    }
 }
+
