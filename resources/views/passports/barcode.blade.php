@@ -29,7 +29,7 @@
         </div>
     </div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-B0gHFnGqN1zB4mPexNnH4dWEuTQix4Yx1XSeFZ8bH6mNbFbhH1P1B5vYd9I6lFozx2SxOmqC9IkbmdvzQJs63g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
     (function(){
         var url = "{{ $passportUrl }}";
@@ -45,4 +45,3 @@
     })();
 </script>
 @endsection
-
