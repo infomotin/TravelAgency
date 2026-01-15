@@ -15,6 +15,7 @@ class Passport extends Model
         'holder_name',
         'mobile',
         'address',
+        'local_agent_id',
         'country_id',
         'airport_id',
         'airline_id',

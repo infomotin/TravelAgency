@@ -96,6 +96,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('passports/setup/airports', [PassportController::class, 'storeAirport'])->name('passports.setup.airports.store');
     Route::post('passports/setup/ticket-agencies', [PassportController::class, 'storeTicketAgency'])->name('passports.setup.ticket_agencies.store');
     Route::post('passports/setup/currencies', [PassportController::class, 'storeCurrency'])->name('passports.setup.currencies.store');
+    Route::post('passports/setup/local-agents', [PassportController::class, 'storeLocalAgent'])->name('passports.setup.local_agents.store');
     Route::get('passports/report', [PassportController::class, 'report'])->name('passports.report');
     Route::get('passports/report/pdf', [PassportController::class, 'reportPdf'])->name('passports.report.pdf');
     Route::resource('passports', PassportController::class);

@@ -201,7 +201,7 @@
                 </div>
             </div>
         </div>
-        <div class="card h-100">
+        <div class="card h-100 mb-3">
             <div class="card-header">Airlines</div>
             <div class="card-body">
                 <p class="text-muted small mb-2">Airlines are managed centrally for tickets and passports.</p>
@@ -224,6 +224,55 @@
                         @empty
                             <tr>
                                 <td colspan="3" class="text-muted text-center">No airlines configured.</td>
+                            </tr>
+                        @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card h-100">
+            <div class="card-header">Local Agents</div>
+            <div class="card-body">
+                <form action="{{ route('passports.setup.local_agents.store') }}" method="post" class="row g-2 mb-3">
+                    @csrf
+                    <div class="col-md-4">
+                        <input type="text" name="name" class="form-control" placeholder="Agent name" required>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="commission_type" class="form-select">
+                            <option value="percentage">Percentage</option>
+                            <option value="fixed">Fixed</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="number" step="0.01" name="commission_value" class="form-control" placeholder="Value" required>
+                    </div>
+                    <div class="col-md-2 d-grid">
+                        <button class="btn btn-primary btn-sm">Add</button>
+                    </div>
+                </form>
+                <div class="table-responsive" style="max-height: 260px; overflow-y: auto;">
+                    <table class="table table-sm mb-0">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Value</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @forelse($localAgents as $agent)
+                            <tr>
+                                <td>{{ $agent->name }}</td>
+                                <td>{{ ucfirst($agent->commission_type) }}</td>
+                                <td>{{ number_format($agent->commission_value, 2) }}</td>
+                                <td>{{ ucfirst($agent->status) }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="text-muted text-center">No local agents added.</td>
                             </tr>
                         @endforelse
                         </tbody>

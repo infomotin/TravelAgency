@@ -57,24 +57,15 @@
     </div>
 </div>
 <div class="row mb-3">
-    <div class="col-md-4">
-        <label class="form-label">Local Agent Name</label>
-        <input type="text" name="local_agent_name" value="{{ old('local_agent_name', $passport->local_agent_name ?? '') }}" class="form-control">
-    </div>
-    <div class="col-md-4">
-        <label class="form-label">Agent Commission Type</label>
-        @php
-            $commissionType = old('local_agent_commission_type', $passport->local_agent_commission_type ?? '');
-        @endphp
-        <select name="local_agent_commission_type" class="form-select">
-            <option value="">None</option>
-            <option value="percentage" @if($commissionType === 'percentage') selected @endif>Percentage</option>
-            <option value="fixed" @if($commissionType === 'fixed') selected @endif>Fixed</option>
+    <div class="col-md-6">
+        <label class="form-label">Local Agent</label>
+        <select name="local_agent_id" class="form-select">
+            <option value="">Select local agent</option>
+            @php $localAgentId = old('local_agent_id', $passport->local_agent_id ?? ''); @endphp
+            @foreach(($localAgents ?? []) as $agent)
+                <option value="{{ $agent->id }}" @if($localAgentId == $agent->id) selected @endif>{{ $agent->name }}</option>
+            @endforeach
         </select>
-    </div>
-    <div class="col-md-4">
-        <label class="form-label">Agent Commission Value</label>
-        <input type="number" step="0.01" name="local_agent_commission_value" value="{{ old('local_agent_commission_value', $passport->local_agent_commission_value ?? 0) }}" class="form-control">
     </div>
 </div>
 <div class="row mb-3">

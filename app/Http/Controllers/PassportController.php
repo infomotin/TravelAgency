@@ -28,8 +28,12 @@ class PassportController extends Controller
         $airports = DB::table('airports')->orderBy('name')->get();
         $ticketAgencies = DB::table('ticket_agencies')->orderBy('name')->get();
         $currencies = DB::table('currencies')->orderBy('code')->get();
+        $localAgents = DB::table('local_agents')
+            ->where('agency_id', app('currentAgency')->id)
+            ->orderBy('name')
+            ->get();
 
-        return view('passports.setup', compact('countries', 'airlines', 'airports', 'ticketAgencies', 'currencies'));
+        return view('passports.setup', compact('countries', 'airlines', 'airports', 'ticketAgencies', 'currencies', 'localAgents'));
     }
 
     public function storeCountry(Request $request)
@@ -114,6 +118,27 @@ class PassportController extends Controller
         return redirect()->route('passports.setup');
     }
 
+    public function storeLocalAgent(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'commission_type' => ['required', 'in:percentage,fixed'],
+            'commission_value' => ['required', 'numeric', 'min:0'],
+        ]);
+
+        DB::table('local_agents')->insert([
+            'agency_id' => app('currentAgency')->id,
+            'name' => $validated['name'],
+            'commission_type' => $validated['commission_type'],
+            'commission_value' => $validated['commission_value'],
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->route('passports.setup');
+    }
+
     public function create()
     {
         $countries = \Illuminate\Support\Facades\DB::table('countries')->orderBy('name')->get();
@@ -121,7 +146,11 @@ class PassportController extends Controller
         $airports = \Illuminate\Support\Facades\DB::table('airports')->orderBy('name')->get();
         $ticketAgencies = \Illuminate\Support\Facades\DB::table('ticket_agencies')->orderBy('name')->get();
         $currencies = \Illuminate\Support\Facades\DB::table('currencies')->orderBy('code')->get();
-        return view('passports.create', compact('countries', 'airlines', 'airports', 'ticketAgencies', 'currencies'));
+        $localAgents = \Illuminate\Support\Facades\DB::table('local_agents')
+            ->where('agency_id', app('currentAgency')->id)
+            ->orderBy('name')
+            ->get();
+        return view('passports.create', compact('countries', 'airlines', 'airports', 'ticketAgencies', 'currencies', 'localAgents'));
     }
 
     public function store(Request $request)
@@ -130,6 +159,7 @@ class PassportController extends Controller
             'holder_name' => 'required|string|max:255',
             'mobile' => 'nullable|string|max:50',
             'address' => 'nullable|string|max:255',
+            'local_agent_id' => 'nullable|integer|exists:local_agents,id',
             'country_id' => 'nullable|integer|exists:countries,id',
             'airport_id' => 'nullable|integer|exists:airports,id',
             'airline_id' => 'nullable|integer|exists:airlines,id',
@@ -149,9 +179,6 @@ class PassportController extends Controller
             'entry_charge' => 'nullable|numeric|min:0',
             'person_commission' => 'nullable|numeric|min:0',
             'is_free' => 'nullable|boolean',
-            'local_agent_name' => 'nullable|string|max:255',
-            'local_agent_commission_type' => 'nullable|in:percentage,fixed',
-            'local_agent_commission_value' => 'nullable|numeric|min:0',
         ]);
 
         $path = null;
@@ -162,15 +189,29 @@ class PassportController extends Controller
 
         $entryCharge = $validated['is_free'] ? 0 : ($validated['entry_charge'] ?? 0);
 
-        $commissionType = $validated['local_agent_commission_type'] ?? null;
-        $commissionValue = $validated['local_agent_commission_value'] ?? 0;
+        $localAgentId = $validated['local_agent_id'] ?? null;
+        $commissionType = null;
+        $commissionValue = 0;
         $agentCommissionAmount = 0;
 
-        if ($commissionType && $commissionValue > 0 && $entryCharge > 0) {
-            if ($commissionType === 'percentage') {
-                $agentCommissionAmount = round($entryCharge * ($commissionValue / 100), 2);
-            } else {
-                $agentCommissionAmount = $commissionValue;
+        $localAgentName = null;
+
+        if ($localAgentId) {
+            $agent = DB::table('local_agents')
+                ->where('id', $localAgentId)
+                ->where('agency_id', app('currentAgency')->id)
+                ->first();
+            if ($agent) {
+                $localAgentName = $agent->name;
+                $commissionType = $agent->commission_type;
+                $commissionValue = (float) $agent->commission_value;
+                if ($commissionValue > 0 && $entryCharge > 0) {
+                    if ($commissionType === 'percentage') {
+                        $agentCommissionAmount = round($entryCharge * ($commissionValue / 100), 2);
+                    } else {
+                        $agentCommissionAmount = $commissionValue;
+                    }
+                }
             }
         }
 
@@ -179,6 +220,7 @@ class PassportController extends Controller
             'holder_name' => $validated['holder_name'],
             'mobile' => $validated['mobile'] ?? null,
             'address' => $validated['address'] ?? null,
+            'local_agent_id' => $localAgentId,
             'country_id' => $validated['country_id'] ?? null,
             'airport_id' => $validated['airport_id'] ?? null,
             'airline_id' => $validated['airline_id'] ?? null,
@@ -192,7 +234,7 @@ class PassportController extends Controller
             'person_commission' => $validated['person_commission'] ?? 0,
             'is_free' => $validated['is_free'] ?? false,
             'purpose' => $validated['purpose'] ?? null,
-            'local_agent_name' => $validated['local_agent_name'] ?? null,
+            'local_agent_name' => $localAgentName,
             'local_agent_commission_type' => $commissionType,
             'local_agent_commission_value' => $commissionValue,
             'local_agent_commission_amount' => $agentCommissionAmount,
@@ -410,7 +452,11 @@ class PassportController extends Controller
         $airports = \Illuminate\Support\Facades\DB::table('airports')->orderBy('name')->get();
         $ticketAgencies = \Illuminate\Support\Facades\DB::table('ticket_agencies')->orderBy('name')->get();
         $currencies = \Illuminate\Support\Facades\DB::table('currencies')->orderBy('code')->get();
-        return view('passports.edit', compact('passport', 'countries', 'airlines', 'airports', 'ticketAgencies', 'currencies'));
+        $localAgents = \Illuminate\Support\Facades\DB::table('local_agents')
+            ->where('agency_id', app('currentAgency')->id)
+            ->orderBy('name')
+            ->get();
+        return view('passports.edit', compact('passport', 'countries', 'airlines', 'airports', 'ticketAgencies', 'currencies', 'localAgents'));
     }
 
     public function update(Request $request, Passport $passport)
@@ -421,6 +467,7 @@ class PassportController extends Controller
             'holder_name' => 'required|string|max:255',
             'mobile' => 'nullable|string|max:50',
             'address' => 'nullable|string|max:255',
+            'local_agent_id' => 'nullable|integer|exists:local_agents,id',
             'country_id' => 'nullable|integer|exists:countries,id',
             'airport_id' => 'nullable|integer|exists:airports,id',
             'airline_id' => 'nullable|integer|exists:airlines,id',
@@ -440,9 +487,6 @@ class PassportController extends Controller
             'entry_charge' => 'nullable|numeric|min:0',
             'person_commission' => 'nullable|numeric|min:0',
             'is_free' => 'nullable|boolean',
-            'local_agent_name' => 'nullable|string|max:255',
-            'local_agent_commission_type' => 'nullable|in:percentage,fixed',
-            'local_agent_commission_value' => 'nullable|numeric|min:0',
         ]);
 
         $path = $passport->document_path;
@@ -457,15 +501,28 @@ class PassportController extends Controller
 
         $entryCharge = $validated['is_free'] ? 0 : ($validated['entry_charge'] ?? 0);
 
-        $commissionType = $validated['local_agent_commission_type'] ?? null;
-        $commissionValue = $validated['local_agent_commission_value'] ?? 0;
+        $localAgentId = $validated['local_agent_id'] ?? null;
+        $commissionType = null;
+        $commissionValue = 0;
         $agentCommissionAmount = 0;
+        $localAgentName = null;
 
-        if ($commissionType && $commissionValue > 0 && $entryCharge > 0) {
-            if ($commissionType === 'percentage') {
-                $agentCommissionAmount = round($entryCharge * ($commissionValue / 100), 2);
-            } else {
-                $agentCommissionAmount = $commissionValue;
+        if ($localAgentId) {
+            $agent = DB::table('local_agents')
+                ->where('id', $localAgentId)
+                ->where('agency_id', app('currentAgency')->id)
+                ->first();
+            if ($agent) {
+                $localAgentName = $agent->name;
+                $commissionType = $agent->commission_type;
+                $commissionValue = (float) $agent->commission_value;
+                if ($commissionValue > 0 && $entryCharge > 0) {
+                    if ($commissionType === 'percentage') {
+                        $agentCommissionAmount = round($entryCharge * ($commissionValue / 100), 2);
+                    } else {
+                        $agentCommissionAmount = $commissionValue;
+                    }
+                }
             }
         }
 
@@ -473,6 +530,7 @@ class PassportController extends Controller
             'holder_name' => $validated['holder_name'],
             'mobile' => $validated['mobile'] ?? null,
             'address' => $validated['address'] ?? null,
+            'local_agent_id' => $localAgentId,
             'country_id' => $validated['country_id'] ?? null,
             'airport_id' => $validated['airport_id'] ?? null,
             'airline_id' => $validated['airline_id'] ?? null,
@@ -486,7 +544,7 @@ class PassportController extends Controller
             'person_commission' => $validated['person_commission'] ?? 0,
             'is_free' => $validated['is_free'] ?? false,
             'purpose' => $validated['purpose'] ?? null,
-            'local_agent_name' => $validated['local_agent_name'] ?? null,
+            'local_agent_name' => $localAgentName,
             'local_agent_commission_type' => $commissionType,
             'local_agent_commission_value' => $commissionValue,
             'local_agent_commission_amount' => $agentCommissionAmount,

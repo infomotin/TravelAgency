@@ -286,6 +286,7 @@
                 <div class="module-items" data-module="travel">
                     <a href="{{ route('passports.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('passports.index') || request()->routeIs('passports.show') || request()->routeIs('passports.edit') || request()->routeIs('passports.create') ? 'active' : '' }}">Passports</a>
                     <a href="{{ route('passports.setup') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('passports.setup') ? 'active' : '' }}">Passport Setup</a>
+                    <a href="{{ route('passports.report') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('passports.report') ? 'active' : '' }}">Passport Report</a>
                 </div>
                 @endif
                 @can('hr_setup.view')
