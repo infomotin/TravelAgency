@@ -40,7 +40,7 @@ class PassportController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'iso_code' => ['nullable', 'string', 'size:3', 'unique:countries,iso_code'],
+            'iso_code' => ['nullable', 'string', 'max:3', 'unique:countries,iso_code'],
         ]);
 
         DB::table('countries')->insert([
@@ -51,14 +51,14 @@ class PassportController extends Controller
             'updated_at' => now(),
         ]);
 
-        return redirect()->route('passports.setup');
+        return redirect()->route('passports.setup')->with('success', 'Country added successfully.');
     }
 
     public function storeAirport(Request $request)
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'iata_code' => ['nullable', 'string', 'size:3', 'unique:airports,iata_code'],
+            'iata_code' => ['nullable', 'string', 'max:3', 'unique:airports,iata_code'],
             'city' => ['nullable', 'string', 'max:255'],
             'country_id' => ['nullable', 'integer', 'exists:countries,id'],
         ]);
@@ -73,7 +73,7 @@ class PassportController extends Controller
             'updated_at' => now(),
         ]);
 
-        return redirect()->route('passports.setup');
+        return redirect()->route('passports.setup')->with('success', 'Airport added successfully.');
     }
 
     public function storeTicketAgency(Request $request)
@@ -95,13 +95,13 @@ class PassportController extends Controller
             'updated_at' => now(),
         ]);
 
-        return redirect()->route('passports.setup');
+        return redirect()->route('passports.setup')->with('success', 'Ticket Agency added successfully.');
     }
 
     public function storeCurrency(Request $request)
     {
         $validated = $request->validate([
-            'code' => ['required', 'string', 'size:3', 'unique:currencies,code'],
+            'code' => ['required', 'string', 'max:3', 'unique:currencies,code'],
             'name' => ['required', 'string', 'max:255'],
             'symbol' => ['nullable', 'string', 'max:8'],
         ]);
@@ -115,7 +115,7 @@ class PassportController extends Controller
             'updated_at' => now(),
         ]);
 
-        return redirect()->route('passports.setup');
+        return redirect()->route('passports.setup')->with('success', 'Currency added successfully.');
     }
 
     public function storeLocalAgent(Request $request)
@@ -136,7 +136,7 @@ class PassportController extends Controller
             'updated_at' => now(),
         ]);
 
-        return redirect()->route('passports.setup');
+        return redirect()->route('passports.setup')->with('success', 'Local Agent added successfully.');
     }
 
     public function create()

@@ -231,7 +231,7 @@
                 </div>
             </div>
         </div>
-        <div class="card h-100">
+        <div class="card h-100" id="local-agents">
             <div class="card-header">Local Agents</div>
             <div class="card-body">
                 <form action="{{ route('passports.setup.local_agents.store') }}" method="post" class="row g-2 mb-3">

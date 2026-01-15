@@ -286,6 +286,7 @@
                 <div class="module-items" data-module="travel">
                     <a href="{{ route('passports.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('passports.index') || request()->routeIs('passports.show') || request()->routeIs('passports.edit') || request()->routeIs('passports.create') ? 'active' : '' }}">Passports</a>
                     <a href="{{ route('passports.setup') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('passports.setup') ? 'active' : '' }}">Passport Setup</a>
+                    <a href="{{ route('passports.setup') }}#local-agents" class="list-group-item list-group-item-action ps-4">Local Agent Setup</a>
                     <a href="{{ route('passports.report') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('passports.report') ? 'active' : '' }}">Passport Report</a>
                 </div>
                 @endif
@@ -317,6 +318,20 @@
         </aside>
         <main class="col-md-10 col-lg-10 py-4 app-main">
             <div class="app-main-inner">
+                @if($errors->any())
+                    <div class="alert alert-danger mb-4">
+                        <ul class="mb-0">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+                @if(session('success'))
+                    <div class="alert alert-success mb-4">
+                        {{ session('success') }}
+                    </div>
+                @endif
                 <div class="app-content-card">
                     @yield('content')
                 </div>
