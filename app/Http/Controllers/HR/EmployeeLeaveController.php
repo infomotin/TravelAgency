@@ -29,7 +29,7 @@ class EmployeeLeaveController extends Controller
             ->get();
         $policies = LeavePolicy::where('agency_id', $agencyId)->orderBy('name')->get();
 
-        return view('employee_leaves.create', compact('employees', 'policies'));
+        return view('hr.employee_leaves.create', compact('employees', 'policies'));
     }
 
     public function store(Request $request)
@@ -74,7 +74,7 @@ class EmployeeLeaveController extends Controller
             ->orderByDesc('created_at')
             ->paginate(30);
 
-        return view('employee_leaves.index', compact('leaves'));
+        return view('hr.employee_leaves.index', compact('leaves'));
     }
 
     public function update(Request $request, EmployeeLeave $employee_leave)
@@ -128,4 +128,3 @@ class EmployeeLeaveController extends Controller
         }
     }
 }
-

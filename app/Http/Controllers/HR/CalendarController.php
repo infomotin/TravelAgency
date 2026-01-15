@@ -33,7 +33,7 @@ class CalendarController extends Controller
             ->orderBy('date')
             ->get();
 
-        return view('calendar.index', [
+        return view('hr.calendar.index', [
             'year' => $year,
             'month' => $month,
             'dates' => $dates,
@@ -104,4 +104,3 @@ class CalendarController extends Controller
         return back()->with('success', 'Date status updated.');
     }
 }
-

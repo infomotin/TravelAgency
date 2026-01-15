@@ -21,13 +21,13 @@ class SalaryStructureController extends Controller
             ->orderBy('id', 'desc')
             ->paginate(20);
 
-        return view('payroll.salary_structures.index', compact('structures'));
+        return view('hr.payroll.salary_structures.index', compact('structures'));
     }
 
     public function edit(Employee $employee)
     {
         $structure = SalaryStructure::where('employee_id', $employee->id)->first();
-        return view('payroll.salary_structures.edit', compact('employee', 'structure'));
+        return view('hr.payroll.salary_structures.edit', compact('employee', 'structure'));
     }
 
     public function update(Request $request, Employee $employee)
@@ -55,4 +55,3 @@ class SalaryStructureController extends Controller
         return redirect()->route('payroll.salary_structures.index');
     }
 }
-

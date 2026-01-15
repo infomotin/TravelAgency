@@ -33,7 +33,7 @@ class HRReportController extends Controller
 
         $employees = $query->orderBy('name')->paginate(50);
 
-        return view('hr_reports.employees', [
+        return view('hr.reports.employees', [
             'employees' => $employees,
             'departments' => $departments,
             'filters' => $request->only('department_id', 'status'),
@@ -62,7 +62,7 @@ class HRReportController extends Controller
             ];
         }
 
-        return view('hr_reports.attendance', [
+        return view('hr.reports.attendance', [
             'month' => $month,
             'rows' => $rows,
         ]);
@@ -92,7 +92,7 @@ class HRReportController extends Controller
 
         $leaves = $query->orderBy('start_date')->paginate(50);
 
-        return view('hr_reports.leaves', [
+        return view('hr.reports.leaves', [
             'leaves' => $leaves,
             'policies' => $policies,
             'filters' => [
@@ -104,4 +104,3 @@ class HRReportController extends Controller
         ]);
     }
 }
-

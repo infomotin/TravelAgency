@@ -28,7 +28,7 @@ class EmployeeController extends Controller
     public function index()
     {
         $employees = Employee::where('agency_id', app('currentAgency')->id)->paginate(20);
-        return view('employees.index', compact('employees'));
+        return view('hr.employees.index', compact('employees'));
     }
 
     public function create()
@@ -37,7 +37,7 @@ class EmployeeController extends Controller
         $departments = Department::where('agency_id', $agencyId)->orderBy('name')->get();
         $designations = Designation::where('agency_id', $agencyId)->orderBy('name')->get();
         $shifts = Shift::where('agency_id', $agencyId)->orderBy('name')->get();
-        return view('employees.create', compact('departments', 'designations', 'shifts'));
+        return view('hr.employees.create', compact('departments', 'designations', 'shifts'));
     }
 
     public function store(Request $request)
@@ -85,7 +85,7 @@ class EmployeeController extends Controller
 
     public function show(Employee $employee)
     {
-        return view('employees.show', compact('employee'));
+        return view('hr.employees.show', compact('employee'));
     }
 
     public function edit(Employee $employee)
@@ -94,7 +94,7 @@ class EmployeeController extends Controller
         $departments = Department::where('agency_id', $agencyId)->orderBy('name')->get();
         $designations = Designation::where('agency_id', $agencyId)->orderBy('name')->get();
         $shifts = Shift::where('agency_id', $agencyId)->orderBy('name')->get();
-        return view('employees.edit', compact('employee', 'departments', 'designations', 'shifts'));
+        return view('hr.employees.edit', compact('employee', 'departments', 'designations', 'shifts'));
     }
 
     public function update(Request $request, Employee $employee)
@@ -200,4 +200,3 @@ class EmployeeController extends Controller
         return redirect()->route('employees.index');
     }
 }
-

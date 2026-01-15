@@ -28,7 +28,7 @@ class PayslipController extends Controller
 
         $payslips = $query->orderByDesc('month')->orderBy('employee_id')->paginate(50);
 
-        return view('payroll.payslips.index', [
+        return view('hr.payroll.payslips.index', [
             'payslips' => $payslips,
             'month' => $month,
         ]);
@@ -41,7 +41,7 @@ class PayslipController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('payroll.payslips.create', compact('employees'));
+        return view('hr.payroll.payslips.create', compact('employees'));
     }
 
     public function store(Request $request, PayrollService $service)
@@ -67,4 +67,3 @@ class PayslipController extends Controller
         return back();
     }
 }
-

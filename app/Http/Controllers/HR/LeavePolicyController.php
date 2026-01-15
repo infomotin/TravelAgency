@@ -21,12 +21,12 @@ class LeavePolicyController extends Controller
         $policies = LeavePolicy::where('agency_id', app('currentAgency')->id)
             ->orderBy('name')
             ->paginate(20);
-        return view('leave_policies.index', compact('policies'));
+        return view('hr.leave_policies.index', compact('policies'));
     }
 
     public function create()
     {
-        return view('leave_policies.create');
+        return view('hr.leave_policies.create');
     }
 
     public function store(Request $request)
@@ -44,7 +44,7 @@ class LeavePolicyController extends Controller
 
     public function edit(LeavePolicy $leave_policy)
     {
-        return view('leave_policies.edit', ['policy' => $leave_policy]);
+        return view('hr.leave_policies.edit', ['policy' => $leave_policy]);
     }
 
     public function update(Request $request, LeavePolicy $leave_policy)
@@ -65,4 +65,3 @@ class LeavePolicyController extends Controller
         return redirect()->route('leave_policies.index');
     }
 }
-

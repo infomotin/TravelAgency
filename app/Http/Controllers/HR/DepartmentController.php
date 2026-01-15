@@ -21,12 +21,12 @@ class DepartmentController extends Controller
         $departments = Department::where('agency_id', app('currentAgency')->id)
             ->orderBy('name')
             ->paginate(20);
-        return view('departments.index', compact('departments'));
+        return view('hr.departments.index', compact('departments'));
     }
 
     public function create()
     {
-        return view('departments.create');
+        return view('hr.departments.create');
     }
 
     public function store(Request $request)
@@ -41,7 +41,7 @@ class DepartmentController extends Controller
 
     public function edit(Department $department)
     {
-        return view('departments.edit', compact('department'));
+        return view('hr.departments.edit', compact('department'));
     }
 
     public function update(Request $request, Department $department)
@@ -59,4 +59,3 @@ class DepartmentController extends Controller
         return redirect()->route('departments.index');
     }
 }
-
