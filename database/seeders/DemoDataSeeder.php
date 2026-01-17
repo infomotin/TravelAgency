@@ -9,6 +9,7 @@ class DemoDataSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            UserDemoSeeder::class,
             HajjDemoSeeder::class,
             TicketDemoSeeder::class,
             PassportDemoSeeder::class,
@@ -17,4 +18,3 @@ class DemoDataSeeder extends Seeder
         ]);
     }
 }
-

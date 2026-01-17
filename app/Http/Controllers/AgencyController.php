@@ -40,6 +40,7 @@ class AgencyController extends Controller
         if (empty($validated['slug'])) {
             $validated['slug'] = Str::slug($validated['name']);
         }
+        $validated['code'] = $this->generateAgencyCode();
         $agency = Agency::create($validated);
 
         return redirect()->route('agencies.show', $agency);
@@ -102,6 +103,23 @@ class AgencyController extends Controller
         $agency->update($data);
 
         return redirect()->route('agencies.edit', $agency)->with('success', 'Profile updated successfully.');
+    }
+
+    protected function generateAgencyCode(): string
+    {
+        $last = Agency::whereNotNull('code')
+            ->orderByDesc('id')
+            ->first();
+
+        $number = 1;
+
+        if ($last && $last->code) {
+            if (preg_match('/(\d+)$/', $last->code, $matches)) {
+                $number = (int) $matches[1] + 1;
+            }
+        }
+
+        return 'AG-'.str_pad((string) $number, 3, '0', STR_PAD_LEFT);
     }
 
     public function destroy(Agency $agency)

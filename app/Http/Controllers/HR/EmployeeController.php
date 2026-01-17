@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Department;
 use App\Models\Designation;
 use App\Models\Employee;
+use App\Models\SalaryStructure;
 use App\Models\Role;
 use App\Models\Shift;
 use App\Models\User;
@@ -77,6 +78,17 @@ class EmployeeController extends Controller
         }
 
         $employee = Employee::create($validated);
+
+        SalaryStructure::firstOrCreate(
+            ['employee_id' => $employee->id],
+            [
+                'basic' => 0,
+                'house_rent' => 0,
+                'medical' => 0,
+                'transport' => 0,
+                'overtime_rate_per_hour' => 0,
+            ]
+        );
 
         if (! empty($employee->email)) {
             $this->ensureEmployeeUserAndRole($employee);
