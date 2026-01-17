@@ -24,6 +24,9 @@ use App\Http\Controllers\HR\LeavePolicyController;
 use App\Http\Controllers\HR\PayslipController;
 use App\Http\Controllers\HR\SalaryStructureController;
 use App\Http\Controllers\HR\ShiftController;
+use App\Http\Controllers\Hajj\HajjInvoiceController;
+use App\Http\Controllers\Hajj\HajjPreInvoiceController;
+use App\Http\Controllers\Hajj\HajjRegistrationController;
 use App\Http\Controllers\PassportController;
 use App\Http\Controllers\PassportStatusController;
 use App\Http\Controllers\PermissionController;
@@ -132,6 +135,13 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::put('contacts/{contact}/gifts/{gift}', [ContactController::class, 'updateGift'])->name('contacts.gifts.update');
     Route::delete('contacts/{contact}/gifts/{gift}', [ContactController::class, 'destroyGift'])->name('contacts.gifts.destroy');
     Route::resource('companies', CompanyController::class)->only(['index', 'store', 'update', 'destroy']);
+    Route::get('hajj/pre-invoices', [HajjPreInvoiceController::class, 'index'])->name('hajj.pre_invoices.index');
+    Route::get('hajj/invoices', [HajjInvoiceController::class, 'index'])->name('hajj.invoices.index');
+    Route::prefix('hajj')->name('hajj.')->group(function () {
+        Route::get('registrations', [HajjRegistrationController::class, 'index'])->name('registrations.index');
+        Route::get('registrations/create', [HajjRegistrationController::class, 'create'])->name('registrations.create');
+        Route::post('registrations', [HajjRegistrationController::class, 'store'])->name('registrations.store');
+    });
 });
 
 Route::middleware(['auth'])->group(function () {

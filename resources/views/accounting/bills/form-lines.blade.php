@@ -45,7 +45,13 @@
     @endforeach
     </tbody>
 </table>
-<button type="button" class="btn btn-sm btn-outline-secondary" onclick="addBillLine()">Add Line</button>
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addBillLine()">Add Line</button>
+    <div class="fw-semibold">
+        Total Amount:
+        <span id="bill-total-amount">0.00</span>
+    </div>
+</div>
 
 @error('lines')
 <div class="text-danger small mt-2">{{ $message }}</div>
@@ -82,11 +88,65 @@
             </td>
         `;
         tbody.appendChild(row);
+        attachBillLineEvents(row);
         billLineIndex++;
+        recalcBillTotal();
     }
     function removeBillLine(button) {
         const row = button.closest('tr');
         row.remove();
+        recalcBillTotal();
     }
+    function attachBillLineEvents(row) {
+        const qtyInput = row.querySelector('input[name*="[quantity]"]');
+        const priceInput = row.querySelector('input[name*="[unit_price]"]');
+        const amountInput = row.querySelector('input[name*="[amount]"]');
+        if (qtyInput && priceInput) {
+            qtyInput.addEventListener('input', function () {
+                recalcBillLine(row);
+            });
+            priceInput.addEventListener('input', function () {
+                recalcBillLine(row);
+            });
+        }
+        if (amountInput) {
+            amountInput.addEventListener('input', function () {
+                recalcBillTotal();
+            });
+        }
+    }
+    function recalcBillLine(row) {
+        const qtyInput = row.querySelector('input[name*="[quantity]"]');
+        const priceInput = row.querySelector('input[name*="[unit_price]"]');
+        const amountInput = row.querySelector('input[name*="[amount]"]');
+        const qty = qtyInput ? parseFloat(qtyInput.value) || 0 : 0;
+        const price = priceInput ? parseFloat(priceInput.value) || 0 : 0;
+        const amount = qty * price;
+        if (amountInput) {
+            amountInput.value = amount ? amount.toFixed(2) : '';
+        }
+        recalcBillTotal();
+    }
+    function recalcBillTotal() {
+        const amountInputs = document.querySelectorAll('#bill-lines-body input[name*="[amount]"]');
+        let total = 0;
+        amountInputs.forEach(function (input) {
+            const value = parseFloat(input.value);
+            if (!isNaN(value)) {
+                total += value;
+            }
+        });
+        const totalEl = document.getElementById('bill-total-amount');
+        if (totalEl) {
+            totalEl.textContent = total.toFixed(2);
+        }
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        const rows = document.querySelectorAll('#bill-lines-body tr');
+        rows.forEach(function (row) {
+            attachBillLineEvents(row);
+            recalcBillLine(row);
+        });
+        recalcBillTotal();
+    });
 </script>
-

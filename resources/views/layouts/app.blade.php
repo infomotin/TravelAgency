@@ -296,6 +296,14 @@
                     <a href="{{ route('tickets.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('tickets.*') ? 'active' : '' }}">Air Tickets</a>
                     <a href="{{ route('bills.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('bills.*') ? 'active' : '' }}">Other Invoice</a>
                 </div>
+                <div class="list-group-item text-muted fw-semibold section-title module-toggle" data-module="hajj">
+                    Hajj
+                </div>
+                <div class="module-items" data-module="hajj">
+                    <a href="{{ route('hajj.pre_invoices.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('hajj.pre_invoices.*') ? 'active' : '' }}">Invoice (Hajj Pre Reg:)</a>
+                    <a href="{{ route('hajj.invoices.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('hajj.invoices.*') ? 'active' : '' }}">Invoice(Hajj)</a>
+                    <a href="{{ route('hajj.registrations.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('hajj.registrations.*') ? 'active' : '' }}">Hajj Registration</a>
+                </div>
                 <div class="list-group-item text-muted fw-semibold section-title module-toggle" data-module="configuration">
                     Configuration
                 </div>

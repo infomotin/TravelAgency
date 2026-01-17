@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             InitialPermissionSeeder::class,
             InitialAgencyAndAdminSeeder::class,
             AccountSeeder::class,
+            DemoDataSeeder::class,
         ]);
     }
 }

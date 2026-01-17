@@ -7,9 +7,15 @@ use App\Models\Account;
 use App\Models\Bill;
 use App\Models\BillAttachment;
 use App\Models\BillPayment;
+use App\Models\Passport;
 use App\Models\Party;
 use App\Models\Transaction;
+use App\Models\Employee;
+use App\Models\Airline;
+use App\Models\Product;
+use App\Models\TransportType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class BillController extends Controller
@@ -44,7 +50,52 @@ class BillController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('accounting.bills.create', compact('accounts', 'parties'));
+        $employees = DB::table('employees')
+            ->where('agency_id', $agencyId)
+            ->orderBy('name')
+            ->get();
+
+        $passports = Passport::where('agency_id', $agencyId)
+            ->orderBy('holder_name')
+            ->orderBy('passport_no')
+            ->get();
+
+        $airlines = Airline::orderBy('name')->get();
+
+        $airports = DB::table('airports')
+            ->orderBy('name')
+            ->get();
+
+        $products = Product::where('agency_id', $agencyId)
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get();
+
+        $transportTypes = TransportType::where('agency_id', $agencyId)
+            ->orderBy('name')
+            ->get();
+
+        $vendors = DB::table('ticket_agencies')
+            ->orderBy('name')
+            ->get();
+
+        $paymentAccounts = Account::where('agency_id', $agencyId)
+            ->whereIn('code', ['1001', '1002'])
+            ->orderBy('code')
+            ->get();
+
+        return view('accounting.bills.create', compact(
+            'accounts',
+            'parties',
+            'employees',
+            'passports',
+            'airlines',
+            'airports',
+            'products',
+            'transportTypes',
+            'vendors',
+            'paymentAccounts'
+        ));
     }
 
     public function store(Request $request)
@@ -53,6 +104,7 @@ class BillController extends Controller
             'bill_date' => 'required|date',
             'due_date' => 'nullable|date',
             'party_id' => 'required|exists:parties,id',
+            'employee_id' => 'nullable|exists:employees,id',
             'reference' => 'nullable|string|max:255',
             'lines' => 'required|array|min:1',
             'lines.*.account_id' => 'required|exists:accounts,id',
@@ -61,6 +113,35 @@ class BillController extends Controller
             'lines.*.unit_price' => 'nullable|numeric|min:0',
             'lines.*.amount' => 'nullable|numeric|min:0',
             'attachments.*' => 'nullable|file|max:10240', // 10MB max per file
+            'passport_id' => 'nullable|exists:passports,id',
+            'pax_type' => 'nullable|string|max:50',
+            'ticket_no' => 'nullable|string|max:100',
+            'pnr' => 'nullable|string|max:100',
+            'route_text' => 'nullable|string|max:255',
+            'ticket_reference' => 'nullable|string|max:255',
+            'journey_date' => 'nullable|date',
+            'return_date' => 'nullable|date',
+            'airline_id' => 'nullable|exists:airlines,id',
+            'hotel_name' => 'nullable|string|max:255',
+            'hotel_reference' => 'nullable|string|max:255',
+            'hotel_check_in' => 'nullable|date',
+            'hotel_check_out' => 'nullable|date',
+            'room_type' => 'nullable|string|max:100',
+            'transport_type_id' => 'nullable|exists:transport_types,id',
+            'transport_sales_by' => 'nullable|string|max:255',
+            'transport_reference' => 'nullable|string|max:255',
+            'pickup_place' => 'nullable|string|max:255',
+            'pickup_time' => 'nullable',
+            'dropoff_place' => 'nullable|string|max:255',
+            'dropoff_time' => 'nullable',
+            'billing_pax_name' => 'nullable|string|max:255',
+            'billing_description' => 'nullable|string',
+            'payment_method' => 'nullable|string|max:100',
+            'payment_account_id' => 'nullable|exists:accounts,id',
+            'payment_amount' => 'nullable|numeric|min:0.01',
+            'payment_discount' => 'nullable|numeric|min:0',
+            'payment_date' => 'nullable|date',
+            'payment_note' => 'nullable|string|max:255',
         ]);
 
         $lines = collect($validated['lines'])->map(function ($line) {
@@ -93,6 +174,35 @@ class BillController extends Controller
         $nextNumber = $lastBill ? (intval(substr($lastBill->bill_no, 2)) + 1) : 1;
         $billNo = 'BL'.str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
 
+        $details = [
+            'passport_id' => $validated['passport_id'] ?? null,
+            'pax_type' => $validated['pax_type'] ?? null,
+            'ticket_no' => $validated['ticket_no'] ?? null,
+            'pnr' => $validated['pnr'] ?? null,
+            'route_text' => $validated['route_text'] ?? null,
+            'ticket_reference' => $validated['ticket_reference'] ?? null,
+            'journey_date' => $validated['journey_date'] ?? null,
+            'return_date' => $validated['return_date'] ?? null,
+            'airline_id' => $validated['airline_id'] ?? null,
+            'hotel_name' => $validated['hotel_name'] ?? null,
+            'hotel_reference' => $validated['hotel_reference'] ?? null,
+            'hotel_check_in' => $validated['hotel_check_in'] ?? null,
+            'hotel_check_out' => $validated['hotel_check_out'] ?? null,
+            'room_type' => $validated['room_type'] ?? null,
+            'transport_type_id' => $validated['transport_type_id'] ?? null,
+            'transport_sales_by' => $validated['transport_sales_by'] ?? null,
+            'transport_reference' => $validated['transport_reference'] ?? null,
+            'pickup_place' => $validated['pickup_place'] ?? null,
+            'pickup_time' => $validated['pickup_time'] ?? null,
+            'dropoff_place' => $validated['dropoff_place'] ?? null,
+            'dropoff_time' => $validated['dropoff_time'] ?? null,
+            'billing_pax_name' => $validated['billing_pax_name'] ?? null,
+            'billing_description' => $validated['billing_description'] ?? null,
+            'payment_method' => $validated['payment_method'] ?? null,
+            'payment_discount' => $validated['payment_discount'] ?? null,
+            'payment_note' => $validated['payment_note'] ?? null,
+        ];
+
         $bill = Bill::create([
             'agency_id' => $agencyId,
             'bill_no' => $billNo,
@@ -100,8 +210,10 @@ class BillController extends Controller
             'due_date' => $validated['due_date'] ?? null,
             'type' => 'sale',
             'party_id' => $validated['party_id'],
+            'employee_id' => $validated['employee_id'] ?? null,
             'contact_name' => null, // Deprecated in favor of party_id
             'reference' => $validated['reference'] ?? null,
+            'details' => $details,
             'total_amount' => $totalAmount,
             'paid_amount' => 0,
             'balance_amount' => $totalAmount,
@@ -163,6 +275,61 @@ class BillController extends Controller
                     'credit' => $line['amount'],
                     'description' => $line['description'],
                 ]);
+            }
+        }
+
+        if (! empty($validated['payment_amount']) && ! empty($validated['payment_account_id'])) {
+            $paymentDate = $validated['payment_date'] ?? $validated['bill_date'];
+
+            $arAccountForPayment = Account::where('agency_id', $agencyId)
+                ->where('code', '1003')
+                ->first();
+
+            if ($arAccountForPayment) {
+                $prefix = 'RC';
+                $lastVoucher = Transaction::where('agency_id', $agencyId)
+                    ->where('voucher_no', 'like', $prefix.'%')
+                    ->latest('id')
+                    ->first();
+                $number = $lastVoucher ? intval(substr($lastVoucher->voucher_no, 2)) + 1 : 1;
+                $voucherNo = $prefix.str_pad($number, 6, '0', STR_PAD_LEFT);
+
+                $transaction = Transaction::create([
+                    'agency_id' => $agencyId,
+                    'voucher_no' => $voucherNo,
+                    'date' => $paymentDate,
+                    'type' => 'receipt',
+                    'description' => 'Payment for bill '.$billNo,
+                    'reference' => $validated['payment_note'] ?? null,
+                    'created_by' => auth()->id(),
+                    'status' => 'approved',
+                ]);
+
+                $transaction->lines()->create([
+                    'account_id' => $validated['payment_account_id'],
+                    'debit' => $validated['payment_amount'],
+                    'credit' => 0,
+                    'description' => 'Bill payment',
+                ]);
+
+                $transaction->lines()->create([
+                    'account_id' => $arAccountForPayment->id,
+                    'debit' => 0,
+                    'credit' => $validated['payment_amount'],
+                    'description' => 'Bill payment',
+                ]);
+
+                BillPayment::create([
+                    'bill_id' => $bill->id,
+                    'transaction_id' => $transaction->id,
+                    'amount' => $validated['payment_amount'],
+                    'paid_at' => $paymentDate,
+                ]);
+
+                $bill->paid_amount = $validated['payment_amount'];
+                $bill->balance_amount = $bill->total_amount - $bill->paid_amount;
+                $bill->status = $bill->balance_amount <= 0.01 ? 'paid' : 'partial';
+                $bill->save();
             }
         }
 

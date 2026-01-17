@@ -13,12 +13,14 @@ class Bill extends Model
     protected $fillable = [
         'agency_id',
         'party_id',
+        'employee_id',
         'bill_no',
         'bill_date',
         'due_date',
         'type',
         'contact_name',
         'reference',
+        'details',
         'total_amount',
         'paid_amount',
         'balance_amount',
@@ -29,6 +31,7 @@ class Bill extends Model
     protected $casts = [
         'bill_date' => 'date',
         'due_date' => 'date',
+        'details' => 'array',
     ];
 
     public function agency()
