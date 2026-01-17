@@ -25,7 +25,7 @@ class BillController extends Controller
     public function index()
     {
         $bills = Bill::where('agency_id', app('currentAgency')->id)
-            ->with('party')
+            ->with(['party', 'creator', 'payments.transaction'])
             ->latest('bill_date')
             ->paginate(15);
 

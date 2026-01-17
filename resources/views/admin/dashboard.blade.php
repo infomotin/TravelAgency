@@ -45,7 +45,7 @@
     </div>
 </div>
 
-<div class="card">
+<div class="card mb-4">
     <div class="card-header">
         Quick Links
     </div>
@@ -61,9 +61,118 @@
                 <a href="{{ route('departments.index') }}" class="btn btn-outline-primary w-100">HR Setup</a>
             </div>
             <div class="col-md-3">
-                <a href="{{ route('tickets.index') }}" class="btn btn-outline-primary w-100">Air Ticket</a>
+                <a href="{{ route('tickets.index') }}" class="btn btn-outline-primary w-100">Air Ticket Invoices</a>
+            </div>
+        </div>
+        <div class="row g-2 mt-2">
+            <div class="col-md-3">
+                <a href="{{ route('visas.index') }}" class="btn btn-outline-primary w-100">Visa Invoices</a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ route('passports.index') }}" class="btn btn-outline-primary w-100">Passport Entries</a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ route('products.index') }}" class="btn btn-outline-secondary w-100">Service Products</a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ route('parties.index') }}" class="btn btn-outline-secondary w-100">Customers / Parties</a>
             </div>
         </div>
     </div>
 </div>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">
+                Daily Tickets ({{ $month }})
+            </div>
+            <div class="card-body">
+                <canvas id="adminDailyTicketsChart" height="160"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">
+                Tickets by Airline ({{ $month }})
+            </div>
+            <div class="card-body">
+                <canvas id="adminAirlineTicketsChart" height="160"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.addEventListener('load', function () {
+        var dailyLabels = @json($dailyLabels);
+        var dailyTicketCounts = @json($dailyTicketCounts);
+        var airlineLabels = @json($airlineLabels);
+        var airlineTicketCounts = @json($airlineTicketCounts);
+
+        var dailyCanvas = document.getElementById('adminDailyTicketsChart');
+        if (dailyCanvas && typeof Chart !== 'undefined') {
+            new Chart(dailyCanvas, {
+                type: 'bar',
+                data: {
+                    labels: dailyLabels,
+                    datasets: [
+                        {
+                            label: 'Tickets',
+                            data: dailyTicketCounts,
+                            backgroundColor: 'rgba(13,110,253,0.6)',
+                            borderColor: 'rgba(13,110,253,1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        var airlineCanvas = document.getElementById('adminAirlineTicketsChart');
+        if (airlineCanvas && typeof Chart !== 'undefined') {
+            var palette = [
+                'rgba(13,110,253,0.7)',
+                'rgba(25,135,84,0.7)',
+                'rgba(255,193,7,0.7)',
+                'rgba(220,53,69,0.7)',
+                'rgba(102,16,242,0.7)',
+                'rgba(32,201,151,0.7)'
+            ];
+
+            new Chart(airlineCanvas, {
+                type: 'pie',
+                data: {
+                    labels: airlineLabels,
+                    datasets: [
+                        {
+                            data: airlineTicketCounts,
+                            backgroundColor: airlineLabels.map(function (_, index) {
+                                return palette[index % palette.length];
+                            }),
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+    });
+</script>
 @endsection

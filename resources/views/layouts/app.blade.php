@@ -294,6 +294,7 @@
                     <a href="{{ route('visas.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('visas.index') || request()->routeIs('visas.edit') || request()->routeIs('visas.create') ? 'active' : '' }}">Visas</a>
                     <a href="{{ route('visas.report') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('visas.report') ? 'active' : '' }}">Visa Report</a>
                     <a href="{{ route('tickets.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('tickets.*') ? 'active' : '' }}">Air Tickets</a>
+                    <a href="{{ route('bills.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('bills.*') ? 'active' : '' }}">Other Invoice</a>
                 </div>
                 <div class="list-group-item text-muted fw-semibold section-title module-toggle" data-module="configuration">
                     Configuration
@@ -371,6 +372,7 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-3fp9pRkz6N0yGv0JxCqGSIbY8ZqOPVIT5p7MT2N0Ztk=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.datatables.net/v/bs5/dt-2.0.8/datatables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js" integrity="sha384-3aU3co0R5fB9O8xwfkHEDUJt0S+ELQ7iVK4PGE+36ug6vXq7G/BVdQHAchvhK25N" crossorigin="anonymous"></script>
 <script>
     $(function () {
         $('table[data-datatable="true"]').each(function () {
