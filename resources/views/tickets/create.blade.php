@@ -1,7 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-<h1 class="h3 mb-3">Invoice (Air Ticket)</h1>
+<h1 class="h3 mb-1">Air Ticket</h1>
+<p class="text-muted mb-3">Non Commission</p>
 <form action="{{ route('tickets.store') }}" method="post">
     @csrf
     <div class="card mb-3">
@@ -72,7 +73,7 @@
                     <select name="vendor_id" class="form-select">
                         <option value="">Select Vendor</option>
                         @foreach($vendors as $vendor)
-                            <option value="{{ $vendor->id }}">{{ $vendor->name }}</option>
+                            <option value="{{ $vendor->id }}" @if(old('vendor_id') == $vendor->id) selected @endif>{{ $vendor->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -93,7 +94,7 @@
                     <select name="airline_id" class="form-select" required>
                         <option value="">Select Airline</option>
                         @foreach($airlines as $airline)
-                            <option value="{{ $airline->id }}">{{ $airline->name }}</option>
+                            <option value="{{ $airline->id }}" @if(old('airline_id') == $airline->id) selected @endif>{{ $airline->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -102,7 +103,7 @@
                     <select name="from_airport_id" class="form-select">
                         <option value="">From</option>
                         @foreach($airports as $airport)
-                            <option value="{{ $airport->id }}">{{ $airport->name }}</option>
+                            <option value="{{ $airport->id }}" @if(old('from_airport_id') == $airport->id) selected @endif>{{ $airport->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -111,7 +112,7 @@
                     <select name="to_airport_id" class="form-select">
                         <option value="">To</option>
                         @foreach($airports as $airport)
-                            <option value="{{ $airport->id }}">{{ $airport->name }}</option>
+                            <option value="{{ $airport->id }}" @if(old('to_airport_id') == $airport->id) selected @endif>{{ $airport->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -124,20 +125,17 @@
                     <input type="text" name="gds" class="form-control" value="{{ old('gds') }}">
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Discount</label>
-                    <input type="number" step="0.01" name="discount" class="form-control" value="{{ old('discount') }}">
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Extra Fee</label>
-                    <input type="number" step="0.01" name="extra_fee" class="form-control" value="{{ old('extra_fee') }}">
-                </div>
-                <div class="col-md-4">
                     <label class="form-label">Class</label>
-                    <input type="text" name="class" class="form-control" value="{{ old('class') }}">
+                    <select name="class" class="form-select">
+                        <option value="">Select airticket class</option>
+                        <option value="Economy" @if(old('class') === 'Economy') selected @endif>Economy</option>
+                        <option value="Business" @if(old('class') === 'Business') selected @endif>Business</option>
+                        <option value="First" @if(old('class') === 'First') selected @endif>First</option>
+                    </select>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Ticket Type</label>
-                    <input type="text" name="ticket_type" class="form-control" value="{{ old('ticket_type') }}">
+                    <input type="text" name="ticket_type" class="form-control" value="{{ old('ticket_type', 'NEW TKT') }}">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Segment</label>
@@ -159,69 +157,128 @@
                     <label class="form-label">Remarks</label>
                     <textarea name="remarks" class="form-control" rows="2">{{ old('remarks') }}</textarea>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Tax Amount</label>
-                    <input type="number" step="0.01" name="tax_amount" class="form-control" value="{{ old('tax_amount') }}">
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">7% Commission</label>
-                    <input type="number" step="0.01" name="commission_7_percent" class="form-control" value="{{ old('commission_7_percent') }}">
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Client Price</label>
-                    <input type="number" step="0.01" name="client_price" class="form-control" value="{{ old('client_price') }}">
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Purchase Price</label>
-                    <input type="number" step="0.01" name="purchase_price" class="form-control" value="{{ old('purchase_price') }}">
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Country Tax BD</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">Country Taxes</div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-2">
+                    <label class="form-label">BD</label>
                     <input type="number" step="0.01" name="country_tax_bd" class="form-control" value="{{ old('country_tax_bd') }}">
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Country Tax UT</label>
+                <div class="col-md-2">
+                    <label class="form-label">UT</label>
                     <input type="number" step="0.01" name="country_tax_ut" class="form-control" value="{{ old('country_tax_ut') }}">
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Country Tax E5</label>
+                <div class="col-md-2">
+                    <label class="form-label">E5</label>
                     <input type="number" step="0.01" name="country_tax_e5" class="form-control" value="{{ old('country_tax_e5') }}">
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Country Tax ES</label>
+                <div class="col-md-2">
+                    <label class="form-label">ES</label>
                     <input type="number" step="0.01" name="country_tax_es" class="form-control" value="{{ old('country_tax_es') }}">
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Country Tax XT</label>
+                <div class="col-md-2">
+                    <label class="form-label">XT</label>
                     <input type="number" step="0.01" name="country_tax_xt" class="form-control" value="{{ old('country_tax_xt') }}">
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Country Tax OW</label>
+                <div class="col-md-2">
+                    <label class="form-label">OW</label>
                     <input type="number" step="0.01" name="country_tax_ow" class="form-control" value="{{ old('country_tax_ow') }}">
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Country Tax QA</label>
+                <div class="col-md-2">
+                    <label class="form-label">QA</label>
                     <input type="number" step="0.01" name="country_tax_qa" class="form-control" value="{{ old('country_tax_qa') }}">
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Country Tax PZ</label>
+                <div class="col-md-2">
+                    <label class="form-label">PZ</label>
                     <input type="number" step="0.01" name="country_tax_pz" class="form-control" value="{{ old('country_tax_pz') }}">
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Country Tax G4</label>
+                <div class="col-md-2">
+                    <label class="form-label">G4</label>
                     <input type="number" step="0.01" name="country_tax_g4" class="form-control" value="{{ old('country_tax_g4') }}">
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Country Tax P7</label>
+                <div class="col-md-2">
+                    <label class="form-label">P7</label>
                     <input type="number" step="0.01" name="country_tax_p7" class="form-control" value="{{ old('country_tax_p7') }}">
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Country Tax P8</label>
+                <div class="col-md-2">
+                    <label class="form-label">P8</label>
                     <input type="number" step="0.01" name="country_tax_p8" class="form-control" value="{{ old('country_tax_p8') }}">
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Country Tax R9</label>
+                <div class="col-md-2">
+                    <label class="form-label">R9</label>
                     <input type="number" step="0.01" name="country_tax_r9" class="form-control" value="{{ old('country_tax_r9') }}">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">Summary</div>
+        <div class="card-body">
+            @php
+                $sales = (float) old('client_price', 0);
+                $purchase = (float) old('purchase_price', 0);
+                $profit = $sales - $purchase;
+            @endphp
+            <div class="table-responsive mb-3">
+                <table class="table table-sm align-middle">
+                    <thead>
+                    <tr>
+                        <th style="width:60px;">SL</th>
+                        <th>Ticket No</th>
+                        <th class="text-end">Sales</th>
+                        <th class="text-end">Purchase</th>
+                        <th class="text-end">Profit</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>{{ old('ticket_no') ?: '-' }}</td>
+                        <td class="text-end">{{ number_format($sales, 2) }}</td>
+                        <td class="text-end">{{ number_format($purchase, 2) }}</td>
+                        <td class="text-end">{{ number_format($profit, 2) }}</td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <th colspan="2" class="text-end">TOTAL</th>
+                        <th class="text-end">{{ number_format($sales, 2) }}</th>
+                        <th class="text-end">{{ number_format($purchase, 2) }}</th>
+                        <th class="text-end">{{ number_format($profit, 2) }}</th>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Discount</label>
+                    <input type="number" step="0.01" name="discount" class="form-control" value="{{ old('discount') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Vat / Tax</label>
+                    <input type="number" step="0.01" name="tax_amount" class="form-control" value="{{ old('tax_amount') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Agent Commission</label>
+                    <input type="number" step="0.01" name="agent_commission_amount" class="form-control" value="{{ old('agent_commission_amount') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Net total</label>
+                    <input type="number" step="0.01" name="net_total" class="form-control" value="{{ old('net_total') }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Reference</label>
+                    <input type="text" name="reference" class="form-control" value="{{ old('reference') }}">
+                </div>
+                <div class="col-md-8">
+                    <label class="form-label">Note</label>
+                    <input type="text" name="note" class="form-control" value="{{ old('note') }}">
                 </div>
             </div>
         </div>
@@ -314,4 +371,3 @@
     </div>
 </form>
 @endsection
-

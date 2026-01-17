@@ -286,12 +286,35 @@
                 <div class="module-items" data-module="travel">
                     <a href="{{ route('passports.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('passports.index') || request()->routeIs('passports.show') || request()->routeIs('passports.edit') || request()->routeIs('passports.create') ? 'active' : '' }}">Passports</a>
                     <a href="{{ route('passports.setup') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('passports.setup') ? 'active' : '' }}">Passport Setup</a>
+                    <a href="{{ route('passports.setup') }}#airports" class="list-group-item list-group-item-action ps-4">Airports</a>
                     <a href="{{ route('passports.setup') }}#local-agents" class="list-group-item list-group-item-action ps-4">Local Agent Setup</a>
                     <a href="{{ route('passports.report') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('passports.report') ? 'active' : '' }}">Passport Report</a>
                     <a href="{{ route('passports.local_agent_report') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('passports.local_agent_report') ? 'active' : '' }}">Local Agent Report</a>
                     <a href="{{ route('visas.setup') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('visas.setup') ? 'active' : '' }}">Visa Setup</a>
                     <a href="{{ route('visas.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('visas.index') || request()->routeIs('visas.edit') || request()->routeIs('visas.create') ? 'active' : '' }}">Visas</a>
                     <a href="{{ route('visas.report') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('visas.report') ? 'active' : '' }}">Visa Report</a>
+                    <a href="{{ route('tickets.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('tickets.*') ? 'active' : '' }}">Air Tickets</a>
+                </div>
+                <div class="list-group-item text-muted fw-semibold section-title module-toggle" data-module="configuration">
+                    Configuration
+                </div>
+                <div class="module-items" data-module="configuration">
+                    <a href="#" class="list-group-item list-group-item-action ps-4">App Config</a>
+                    <a href="#" class="list-group-item list-group-item-action ps-4">Signature Details</a>
+                    <a href="{{ route('agencies.edit', app('currentAgency')->id) }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('agencies.edit') ? 'active' : '' }}">Profile Setting</a>
+                    <a href="#" class="list-group-item list-group-item-action ps-4">Client Category</a>
+                    <a href="{{ route('passports.setup') }}#airports" class="list-group-item list-group-item-action ps-4">Airports</a>
+                    <a href="#" class="list-group-item list-group-item-action ps-4">Products</a>
+                    <a href="{{ route('visas.setup') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('visas.setup') ? 'active' : '' }}">Visa Type</a>
+                    <a href="{{ route('departments.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('departments.*') ? 'active' : '' }}">Departments</a>
+                    <a href="#" class="list-group-item list-group-item-action ps-4">Room Types</a>
+                    <a href="#" class="list-group-item list-group-item-action ps-4">Transport Types</a>
+                    <a href="{{ route('designations.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('designations.*') ? 'active' : '' }}">Designation</a>
+                    <a href="{{ route('employees.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('employees.*') ? 'active' : '' }}">Employee</a>
+                    <a href="{{ route('admin.users.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">Users</a>
+                    <a href="#" class="list-group-item list-group-item-action ps-4">Tour Itinerary</a>
+                    <a href="#" class="list-group-item list-group-item-action ps-4">Passport Status</a>
+                    <a href="#" class="list-group-item list-group-item-action ps-4">Groups</a>
                 </div>
                 @endif
                 @can('hr_setup.view')

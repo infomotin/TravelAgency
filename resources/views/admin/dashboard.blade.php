@@ -22,11 +22,11 @@
     <div class="col-md-3">
         <div class="card text-bg-success">
             <div class="card-body">
-                <div class="card-title h6 mb-1">Tickets</div>
-                <div class="display-6">{{ $ticketCount }}</div>
-            </div>
+            <div class="card-title h6 mb-1">Tickets</div>
+            <div class="display-6">{{ $ticketCount }}</div>
+          </div>
         </div>
-    </div>
+      </div>
     <div class="col-md-3">
         <div class="card text-bg-info">
             <div class="card-body">
@@ -61,7 +61,7 @@
                 <a href="{{ route('departments.index') }}" class="btn btn-outline-primary w-100">HR Setup</a>
             </div>
             <div class="col-md-3">
-                <a href="#" class="btn btn-outline-primary w-100">Accounting</a>
+                <a href="{{ route('tickets.index') }}" class="btn btn-outline-primary w-100">Air Ticket</a>
             </div>
         </div>
     </div>
