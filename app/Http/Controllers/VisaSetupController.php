@@ -79,4 +79,3 @@ class VisaSetupController extends Controller
             ->with('success', 'Visa document requirement added successfully.');
     }
 }
-

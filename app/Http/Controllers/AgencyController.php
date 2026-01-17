@@ -20,6 +20,7 @@ class AgencyController extends Controller
     public function index()
     {
         $agencies = Agency::orderBy('name')->paginate(20);
+
         return view('agencies.index', compact('agencies'));
     }
 
@@ -40,6 +41,7 @@ class AgencyController extends Controller
             $validated['slug'] = Str::slug($validated['name']);
         }
         $agency = Agency::create($validated);
+
         return redirect()->route('agencies.show', $agency);
     }
 
@@ -57,7 +59,7 @@ class AgencyController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'slug' => ['required', 'string', 'max:255', 'unique:agencies,slug,' . $agency->id],
+            'slug' => ['required', 'string', 'max:255', 'unique:agencies,slug,'.$agency->id],
             'currency' => ['required', 'string', 'size:3'],
             'status' => ['required', 'in:active,inactive,suspended'],
             'address' => ['nullable', 'string', 'max:255'],
@@ -105,6 +107,7 @@ class AgencyController extends Controller
     public function destroy(Agency $agency)
     {
         $agency->delete();
+
         return redirect()->route('agencies.index');
     }
 }

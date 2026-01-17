@@ -3,16 +3,16 @@
 namespace App\Http\Controllers\HR;
 
 use App\Http\Controllers\Controller;
-use App\Models\Employee;
 use App\Models\Department;
 use App\Models\Designation;
+use App\Models\Employee;
+use App\Models\Role;
 use App\Models\Shift;
 use App\Models\User;
-use App\Models\Role;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class EmployeeController extends Controller
@@ -28,6 +28,7 @@ class EmployeeController extends Controller
     public function index()
     {
         $employees = Employee::where('agency_id', app('currentAgency')->id)->paginate(20);
+
         return view('employees.index', compact('employees'));
     }
 
@@ -37,6 +38,7 @@ class EmployeeController extends Controller
         $departments = Department::where('agency_id', $agencyId)->orderBy('name')->get();
         $designations = Designation::where('agency_id', $agencyId)->orderBy('name')->get();
         $shifts = Shift::where('agency_id', $agencyId)->orderBy('name')->get();
+
         return view('employees.create', compact('departments', 'designations', 'shifts'));
     }
 
@@ -76,7 +78,7 @@ class EmployeeController extends Controller
 
         $employee = Employee::create($validated);
 
-        if (!empty($employee->email)) {
+        if (! empty($employee->email)) {
             $this->ensureEmployeeUserAndRole($employee);
         }
 
@@ -94,13 +96,14 @@ class EmployeeController extends Controller
         $departments = Department::where('agency_id', $agencyId)->orderBy('name')->get();
         $designations = Designation::where('agency_id', $agencyId)->orderBy('name')->get();
         $shifts = Shift::where('agency_id', $agencyId)->orderBy('name')->get();
+
         return view('employees.edit', compact('employee', 'departments', 'designations', 'shifts'));
     }
 
     public function update(Request $request, Employee $employee)
     {
         $validated = $request->validate([
-            'employee_code' => ['required', 'string', 'max:50', 'unique:employees,employee_code,' . $employee->id],
+            'employee_code' => ['required', 'string', 'max:50', 'unique:employees,employee_code,'.$employee->id],
             'name' => ['required', 'string', 'max:255'],
             'joining_date' => ['nullable', 'date'],
             'probation_end_date' => ['nullable', 'date'],
@@ -133,20 +136,21 @@ class EmployeeController extends Controller
         }
 
         $employee->update($validated);
+
         return redirect()->route('employees.show', $employee);
     }
 
     protected function ensureEmployeeUserAndRole(Employee $employee): void
     {
         $email = $employee->email;
-        if (!$email) {
+        if (! $email) {
             return;
         }
 
         $user = User::where('email', $email)->first();
         $passwordPlain = null;
 
-        if (!$user) {
+        if (! $user) {
             $passwordPlain = Str::random(10);
             $user = User::create([
                 'agency_id' => $employee->agency_id,
@@ -158,7 +162,7 @@ class EmployeeController extends Controller
             ]);
         }
 
-        if (!$employee->user_id) {
+        if (! $employee->user_id) {
             $employee->user_id = $user->id;
             $employee->save();
         }
@@ -178,13 +182,13 @@ class EmployeeController extends Controller
                 $loginUrl = route('login.form');
                 $subject = 'Your Employee Account for TravelAgency ERP';
                 $body = "Dear {$employee->name},\n\n"
-                    . "An account has been created for you in the TravelAgency ERP.\n\n"
-                    . "Login URL: {$loginUrl}\n"
-                    . "Email: {$email}\n"
-                    . "Password: {$passwordPlain}\n\n"
-                    . "Please log in and change your password after first login.\n\n"
-                    . "Regards,\n"
-                    . "TravelAgency HR";
+                    ."An account has been created for you in the TravelAgency ERP.\n\n"
+                    ."Login URL: {$loginUrl}\n"
+                    ."Email: {$email}\n"
+                    ."Password: {$passwordPlain}\n\n"
+                    ."Please log in and change your password after first login.\n\n"
+                    ."Regards,\n"
+                    .'TravelAgency HR';
 
                 Mail::raw($body, function ($message) use ($email, $subject) {
                     $message->to($email)->subject($subject);
@@ -197,6 +201,7 @@ class EmployeeController extends Controller
     public function destroy(Employee $employee)
     {
         $employee->delete();
+
         return redirect()->route('employees.index');
     }
 }

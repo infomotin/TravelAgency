@@ -57,14 +57,14 @@ class CalendarController extends Controller
             ->whereYear('date', $year)
             ->where('type', 'ghd')
             ->pluck('date')
-            ->map(fn($d) => Carbon::parse($d)->toDateString())
+            ->map(fn ($d) => Carbon::parse($d)->toDateString())
             ->all();
 
         $ohd = Holiday::where('agency_id', $agencyId)
             ->whereYear('date', $year)
             ->where('type', 'ohd')
             ->pluck('date')
-            ->map(fn($d) => Carbon::parse($d)->toDateString())
+            ->map(fn ($d) => Carbon::parse($d)->toDateString())
             ->all();
 
         DB::transaction(function () use ($agencyId, $start, $end, $weeklyDay, $ghd, $ohd) {
@@ -101,6 +101,7 @@ class CalendarController extends Controller
             'remarks' => ['nullable', 'string', 'max:255'],
         ]);
         $calendarDate->update($validated);
+
         return back()->with('success', 'Date status updated.');
     }
 }

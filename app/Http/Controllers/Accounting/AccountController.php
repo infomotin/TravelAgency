@@ -32,7 +32,7 @@ class AccountController extends Controller
         $parents = Account::where('agency_id', app('currentAgency')->id)
             ->orderBy('code')
             ->get();
-            
+
         return view('accounting.accounts.create', compact('parents'));
     }
 
@@ -48,12 +48,12 @@ class AccountController extends Controller
         ]);
 
         $validated['agency_id'] = app('currentAgency')->id;
-        
+
         // Ensure unique code per agency
         $exists = Account::where('agency_id', $validated['agency_id'])
             ->where('code', $validated['code'])
             ->exists();
-            
+
         if ($exists) {
             return back()->withErrors(['code' => 'Account code already exists.'])->withInput();
         }
@@ -89,7 +89,7 @@ class AccountController extends Controller
             ->where('code', $validated['code'])
             ->where('id', '!=', $account->id)
             ->exists();
-            
+
         if ($exists) {
             return back()->withErrors(['code' => 'Account code already exists.'])->withInput();
         }

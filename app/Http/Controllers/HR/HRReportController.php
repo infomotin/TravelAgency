@@ -75,7 +75,7 @@ class HRReportController extends Controller
 
         $from = $request->query('from');
         $to = $request->query('to');
-        if (!$from || !$to) {
+        if (! $from || ! $to) {
             $from = date('Y-m-01');
             $to = date('Y-m-t');
         }

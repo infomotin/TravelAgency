@@ -19,7 +19,7 @@ class Transaction extends Model
         'reference',
         'party_id',
         'created_by',
-        'status'
+        'status',
     ];
 
     protected $casts = [

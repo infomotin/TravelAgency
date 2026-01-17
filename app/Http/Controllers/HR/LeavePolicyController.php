@@ -21,6 +21,7 @@ class LeavePolicyController extends Controller
         $policies = LeavePolicy::where('agency_id', app('currentAgency')->id)
             ->orderBy('name')
             ->paginate(20);
+
         return view('leave_policies.index', compact('policies'));
     }
 
@@ -39,6 +40,7 @@ class LeavePolicyController extends Controller
         $validated['agency_id'] = app('currentAgency')->id;
         $validated['carry_forward'] = $request->boolean('carry_forward');
         LeavePolicy::create($validated);
+
         return redirect()->route('leave_policies.index');
     }
 
@@ -56,12 +58,14 @@ class LeavePolicyController extends Controller
         ]);
         $validated['carry_forward'] = $request->boolean('carry_forward');
         $leave_policy->update($validated);
+
         return redirect()->route('leave_policies.index');
     }
 
     public function destroy(LeavePolicy $leave_policy)
     {
         $leave_policy->delete();
+
         return redirect()->route('leave_policies.index');
     }
 }

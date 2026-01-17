@@ -21,6 +21,7 @@ class DesignationController extends Controller
         $designations = Designation::where('agency_id', app('currentAgency')->id)
             ->orderBy('name')
             ->paginate(20);
+
         return view('designations.index', compact('designations'));
     }
 
@@ -36,6 +37,7 @@ class DesignationController extends Controller
         ]);
         $validated['agency_id'] = app('currentAgency')->id;
         Designation::create($validated);
+
         return redirect()->route('designations.index');
     }
 
@@ -50,12 +52,14 @@ class DesignationController extends Controller
             'name' => ['required', 'string', 'max:255'],
         ]);
         $designation->update($validated);
+
         return redirect()->route('designations.index');
     }
 
     public function destroy(Designation $designation)
     {
         $designation->delete();
+
         return redirect()->route('designations.index');
     }
 }

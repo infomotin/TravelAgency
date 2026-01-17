@@ -5,9 +5,8 @@ namespace App\Http\Controllers\Accounting;
 use App\Http\Controllers\Controller;
 use App\Models\Account;
 use App\Models\Bill;
-use App\Models\BillLine;
-use App\Models\BillPayment;
 use App\Models\BillAttachment;
+use App\Models\BillPayment;
 use App\Models\Party;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
@@ -39,7 +38,7 @@ class BillController extends Controller
         $accounts = Account::where('agency_id', $agencyId)
             ->orderBy('code')
             ->get();
-            
+
         $parties = Party::where('agency_id', $agencyId)
             ->where('status', 'active')
             ->orderBy('name')
@@ -92,7 +91,7 @@ class BillController extends Controller
             ->latest('id')
             ->first();
         $nextNumber = $lastBill ? (intval(substr($lastBill->bill_no, 2)) + 1) : 1;
-        $billNo = 'BL' . str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
+        $billNo = 'BL'.str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
 
         $bill = Bill::create([
             'agency_id' => $agencyId,
@@ -133,18 +132,18 @@ class BillController extends Controller
         if ($arAccount) {
             $prefix = 'IN';
             $lastVoucher = Transaction::where('agency_id', $agencyId)
-                ->where('voucher_no', 'like', $prefix . '%')
+                ->where('voucher_no', 'like', $prefix.'%')
                 ->latest('id')
                 ->first();
             $number = $lastVoucher ? intval(substr($lastVoucher->voucher_no, 2)) + 1 : 1;
-            $voucherNo = $prefix . str_pad($number, 6, '0', STR_PAD_LEFT);
+            $voucherNo = $prefix.str_pad($number, 6, '0', STR_PAD_LEFT);
 
             $transaction = Transaction::create([
                 'agency_id' => $agencyId,
                 'voucher_no' => $voucherNo,
                 'date' => $validated['bill_date'],
                 'type' => 'journal',
-                'description' => 'Bill ' . $billNo,
+                'description' => 'Bill '.$billNo,
                 'reference' => $bill->reference,
                 'created_by' => auth()->id(),
                 'status' => 'approved',
@@ -154,7 +153,7 @@ class BillController extends Controller
                 'account_id' => $arAccount->id,
                 'debit' => $totalAmount,
                 'credit' => 0,
-                'description' => 'Accounts Receivable for bill ' . $billNo,
+                'description' => 'Accounts Receivable for bill '.$billNo,
             ]);
 
             foreach ($lines as $line) {
@@ -183,7 +182,7 @@ class BillController extends Controller
         $accounts = Account::where('agency_id', $agencyId)
             ->orderBy('code')
             ->get();
-            
+
         $parties = Party::where('agency_id', $agencyId)
             ->where('status', 'active')
             ->orderBy('name')
@@ -315,24 +314,24 @@ class BillController extends Controller
             ->where('code', '1003')
             ->first();
 
-        if (!$arAccount) {
+        if (! $arAccount) {
             return back()->withErrors(['amount' => 'Accounts Receivable account (1003) not found.'])->withInput();
         }
 
         $prefix = 'RC';
         $lastVoucher = Transaction::where('agency_id', $agencyId)
-            ->where('voucher_no', 'like', $prefix . '%')
+            ->where('voucher_no', 'like', $prefix.'%')
             ->latest('id')
             ->first();
         $number = $lastVoucher ? intval(substr($lastVoucher->voucher_no, 2)) + 1 : 1;
-        $voucherNo = $prefix . str_pad($number, 6, '0', STR_PAD_LEFT);
+        $voucherNo = $prefix.str_pad($number, 6, '0', STR_PAD_LEFT);
 
         $transaction = Transaction::create([
             'agency_id' => $agencyId,
             'voucher_no' => $voucherNo,
             'date' => $validated['paid_at'],
             'type' => 'receipt',
-            'description' => 'Payment for bill ' . $bill->bill_no,
+            'description' => 'Payment for bill '.$bill->bill_no,
             'reference' => $validated['description'] ?? null,
             'created_by' => auth()->id(),
             'status' => 'approved',

@@ -37,7 +37,7 @@ class AdminUserController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email,'.$user->id],
             'status' => ['required', 'in:active,inactive'],
         ]);
 
@@ -64,4 +64,3 @@ class AdminUserController extends Controller
         return redirect()->route('admin.users.show', $user);
     }
 }
-

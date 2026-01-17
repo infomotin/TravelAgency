@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class CalendarDate extends Model
 {
@@ -31,4 +31,3 @@ class CalendarDate extends Model
         return static::where('agency_id', $agencyId)->whereDate('date', $date)->value('status');
     }
 }
-

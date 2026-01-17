@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Airline;
 use App\Models\Passport;
 use App\Models\Visa;
 use App\Models\VisaType;
 use App\Models\VisaTypeDocument;
-use App\Models\VisaDocument;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -37,6 +37,8 @@ class VisaController extends Controller
     public function create(Request $request)
     {
         $countries = DB::table('countries')->orderBy('name')->get();
+
+        $airlines = Airline::orderBy('name')->get();
 
         $passports = Passport::where('agency_id', app('currentAgency')->id)
             ->orderBy('holder_name')
@@ -76,13 +78,14 @@ class VisaController extends Controller
                 ->groupBy('visa_type_id');
         }
 
-        return view('visas.create', compact('countries', 'passports', 'agents', 'visaTypes', 'typeDocuments', 'countryId', 'selectedPassportId'));
+        return view('visas.create', compact('countries', 'airlines', 'passports', 'agents', 'visaTypes', 'typeDocuments', 'countryId', 'selectedPassportId'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'passport_id' => ['required', 'integer', 'exists:passports,id'],
+            'airline_id' => ['nullable', 'integer', 'exists:airlines,id'],
             'country_id' => ['required', 'integer', 'exists:countries,id'],
             'visa_type_id' => ['required', 'integer', 'exists:visa_types,id'],
             'issue_date' => ['nullable', 'date'],
@@ -132,6 +135,7 @@ class VisaController extends Controller
 
         $visa = Visa::create([
             'passport_id' => $passport->id,
+            'airline_id' => $validated['airline_id'] ?? null,
             'country_id' => $validated['country_id'] ?? null,
             'visa_type' => $visaType->name,
             'issue_date' => $validated['issue_date'] ?? null,
@@ -146,10 +150,10 @@ class VisaController extends Controller
         if ($request->hasFile('type_documents')) {
             $allowedIds = VisaTypeDocument::where('visa_type_id', $visaType->id)->pluck('id')->all();
             foreach ($request->file('type_documents') as $docId => $file) {
-                if (!$file) {
+                if (! $file) {
                     continue;
                 }
-                if (!in_array((int) $docId, $allowedIds, true)) {
+                if (! in_array((int) $docId, $allowedIds, true)) {
                     continue;
                 }
                 $storedPath = $file->store('visa_documents', 'public');
@@ -171,6 +175,8 @@ class VisaController extends Controller
         $this->authorizeVisa($visa);
 
         $countries = DB::table('countries')->orderBy('name')->get();
+
+        $airlines = Airline::orderBy('name')->get();
 
         $passports = Passport::where('agency_id', app('currentAgency')->id)
             ->orderBy('holder_name')
@@ -199,7 +205,7 @@ class VisaController extends Controller
                 ->groupBy('visa_type_id');
         }
 
-        return view('visas.edit', compact('visa', 'countries', 'passports', 'agents', 'visaTypes', 'typeDocuments'));
+        return view('visas.edit', compact('visa', 'countries', 'airlines', 'passports', 'agents', 'visaTypes', 'typeDocuments'));
     }
 
     public function update(Request $request, Visa $visa)
@@ -208,6 +214,7 @@ class VisaController extends Controller
 
         $validated = $request->validate([
             'passport_id' => ['required', 'integer', 'exists:passports,id'],
+            'airline_id' => ['nullable', 'integer', 'exists:airlines,id'],
             'country_id' => ['required', 'integer', 'exists:countries,id'],
             'visa_type_id' => ['required', 'integer', 'exists:visa_types,id'],
             'issue_date' => ['nullable', 'date'],
@@ -261,6 +268,7 @@ class VisaController extends Controller
 
         $visa->update([
             'passport_id' => $passport->id,
+            'airline_id' => $validated['airline_id'] ?? null,
             'country_id' => $validated['country_id'] ?? null,
             'visa_type' => $visaType->name,
             'issue_date' => $validated['issue_date'] ?? null,
@@ -275,10 +283,10 @@ class VisaController extends Controller
         if ($request->hasFile('type_documents')) {
             $allowedIds = VisaTypeDocument::where('visa_type_id', $visaType->id)->pluck('id')->all();
             foreach ($request->file('type_documents') as $docId => $file) {
-                if (!$file) {
+                if (! $file) {
                     continue;
                 }
-                if (!in_array((int) $docId, $allowedIds, true)) {
+                if (! in_array((int) $docId, $allowedIds, true)) {
                     continue;
                 }
                 $storedPath = $file->store('visa_documents', 'public');
@@ -331,23 +339,23 @@ class VisaController extends Controller
                 $query->where('agency_id', app('currentAgency')->id);
             });
 
-        if (!empty($filters['from_date'])) {
+        if (! empty($filters['from_date'])) {
             $query->whereDate('issue_date', '>=', $filters['from_date']);
         }
 
-        if (!empty($filters['to_date'])) {
+        if (! empty($filters['to_date'])) {
             $query->whereDate('issue_date', '<=', $filters['to_date']);
         }
 
-        if (!empty($filters['country_id'])) {
+        if (! empty($filters['country_id'])) {
             $query->where('country_id', $filters['country_id']);
         }
 
-        if (!empty($filters['agent_id'])) {
+        if (! empty($filters['agent_id'])) {
             $query->where('agent_id', $filters['agent_id']);
         }
 
-        if (!empty($filters['visa_type'])) {
+        if (! empty($filters['visa_type'])) {
             $query->where('visa_type', $filters['visa_type']);
         }
 
@@ -379,7 +387,7 @@ class VisaController extends Controller
 
         $visa->load('passport');
 
-        if (!$visa->invoice_no && $visa->passport && $visa->passport->agency_id) {
+        if (! $visa->invoice_no && $visa->passport && $visa->passport->agency_id) {
             $visa->invoice_no = $this->generateInvoiceNumber($visa->passport->agency_id);
             $visa->invoice_date = now()->toDateString();
             $visa->save();
@@ -391,12 +399,12 @@ class VisaController extends Controller
     protected function generateInvoiceNumber(int $agencyId): string
     {
         $today = now()->format('Ymd');
-        $prefix = 'VISA-' . $today . '-';
+        $prefix = 'VISA-'.$today.'-';
 
         $lastInvoice = DB::table('visas')
             ->join('passports', 'visas.passport_id', '=', 'passports.id')
             ->where('passports.agency_id', $agencyId)
-            ->where('visas.invoice_no', 'like', $prefix . '%')
+            ->where('visas.invoice_no', 'like', $prefix.'%')
             ->orderBy('visas.invoice_no', 'desc')
             ->value('visas.invoice_no');
 
@@ -410,14 +418,14 @@ class VisaController extends Controller
             }
         }
 
-        return $prefix . str_pad((string) $nextNumber, 4, '0', STR_PAD_LEFT);
+        return $prefix.str_pad((string) $nextNumber, 4, '0', STR_PAD_LEFT);
     }
 
     protected function authorizeVisa(Visa $visa): void
     {
         $passport = $visa->passport;
 
-        if (!$passport || $passport->agency_id !== app('currentAgency')->id) {
+        if (! $passport || $passport->agency_id !== app('currentAgency')->id) {
             abort(404);
         }
     }

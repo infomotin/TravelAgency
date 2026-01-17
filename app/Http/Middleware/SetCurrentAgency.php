@@ -21,7 +21,7 @@ class SetCurrentAgency
             $agency = Agency::where('slug', $slug)->first();
         }
 
-        if (!$agency) {
+        if (! $agency) {
             $agency = Agency::first();
         }
 

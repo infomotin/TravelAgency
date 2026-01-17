@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Role;
 use App\Models\Permission;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -20,6 +20,7 @@ class RoleController extends Controller
     public function index()
     {
         $roles = Role::withCount('users')->orderBy('name')->get();
+
         return view('roles.index', compact('roles'));
     }
 
@@ -36,6 +37,7 @@ class RoleController extends Controller
         ]);
         $validated['agency_id'] = app('currentAgency')->id;
         Role::create($validated);
+
         return redirect()->route('roles.index');
     }
 
@@ -50,12 +52,14 @@ class RoleController extends Controller
             'name' => ['required', 'string', 'max:255'],
         ]);
         $role->update($validated);
+
         return redirect()->route('roles.index');
     }
 
     public function destroy(Role $role)
     {
         $role->delete();
+
         return redirect()->route('roles.index');
     }
 
@@ -63,6 +67,7 @@ class RoleController extends Controller
     {
         $permissions = Permission::orderBy('name')->get();
         $rolePermissions = $role->permissions()->pluck('permissions.id')->all();
+
         return view('roles.permissions', compact('role', 'permissions', 'rolePermissions'));
     }
 
@@ -70,6 +75,7 @@ class RoleController extends Controller
     {
         $permissionIds = $request->input('permissions', []);
         $role->permissions()->sync($permissionIds);
+
         return redirect()->route('roles.index');
     }
 
@@ -77,6 +83,7 @@ class RoleController extends Controller
     {
         $users = User::where('agency_id', app('currentAgency')->id)->orderBy('name')->get();
         $roleUsers = $role->users()->pluck('users.id')->all();
+
         return view('roles.users', compact('role', 'users', 'roleUsers'));
     }
 
@@ -84,7 +91,7 @@ class RoleController extends Controller
     {
         $userIds = $request->input('users', []);
         $role->users()->sync($userIds);
+
         return redirect()->route('roles.index');
     }
 }
-

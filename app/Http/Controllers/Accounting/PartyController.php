@@ -48,14 +48,14 @@ class PartyController extends Controller
     public function show(Party $party)
     {
         // This will serve as the Party Balance Sheet / Ledger
-        $party->load(['bills' => function($query) {
+        $party->load(['bills' => function ($query) {
             $query->latest('bill_date');
         }]);
 
         // Calculate current balance (Opening + Billed - Paid)
         // Note: Logic might need adjustment based on type (Customer vs Vendor)
         // For now assuming Customer logic (Debit increases balance)
-        
+
         return view('accounting.parties.show', compact('party'));
     }
 

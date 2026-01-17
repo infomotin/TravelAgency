@@ -15,7 +15,7 @@ class PayrollController extends Controller
             'month' => ['required', 'regex:/^\\d{4}-\\d{2}$/'],
         ]);
         $payslip = $service->generatePayslip($employee, $validated['month']);
+
         return response()->json($payslip);
     }
 }
-

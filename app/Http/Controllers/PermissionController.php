@@ -18,6 +18,7 @@ class PermissionController extends Controller
     public function index()
     {
         $permissions = Permission::orderBy('name')->get();
+
         return view('permissions.index', compact('permissions'));
     }
 
@@ -33,6 +34,7 @@ class PermissionController extends Controller
             'slug' => ['required', 'string', 'max:50', 'unique:permissions,slug'],
         ]);
         Permission::create($validated);
+
         return redirect()->route('permissions.index');
     }
 
@@ -47,12 +49,14 @@ class PermissionController extends Controller
             'name' => ['required', 'string', 'max:255'],
         ]);
         $permission->update($validated);
+
         return redirect()->route('permissions.index');
     }
 
     public function destroy(Permission $permission)
     {
         $permission->delete();
+
         return redirect()->route('permissions.index');
     }
 }

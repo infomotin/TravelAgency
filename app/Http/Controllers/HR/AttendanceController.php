@@ -4,8 +4,8 @@ namespace App\Http\Controllers\HR;
 
 use App\Http\Controllers\Controller;
 use App\Models\AttendanceRecord;
-use App\Models\Employee;
 use App\Models\CalendarDate;
+use App\Models\Employee;
 use Illuminate\Http\Request;
 
 class AttendanceController extends Controller
@@ -41,7 +41,7 @@ class AttendanceController extends Controller
             ['employee_id' => $employee->id, 'date' => $validated['date']],
             $validated
         );
+
         return response()->json($record);
     }
 }
-

@@ -27,6 +27,7 @@ class SalaryStructureController extends Controller
     public function edit(Employee $employee)
     {
         $structure = SalaryStructure::where('employee_id', $employee->id)->first();
+
         return view('payroll.salary_structures.edit', compact('employee', 'structure'));
     }
 

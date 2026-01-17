@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\Agency;
 use App\Models\Account;
+use App\Models\Agency;
+use Illuminate\Database\Seeder;
 
 class AccountSeeder extends Seeder
 {
@@ -30,16 +30,16 @@ class AccountSeeder extends Seeder
                             'Cash in Hand' => ['code' => '1001', 'is_system' => true],
                             'Bank Accounts' => ['code' => '1002', 'is_system' => true],
                             'Accounts Receivable' => ['code' => '1003'],
-                        ]
+                        ],
                     ],
                     'Fixed Assets' => [
                         'code' => '1020',
                         'children' => [
                             'Furniture & Fixtures' => ['code' => '1101'],
                             'Computers & Equipment' => ['code' => '1102'],
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ],
             'Liabilities' => [
                 'type' => 'liability',
@@ -50,9 +50,9 @@ class AccountSeeder extends Seeder
                         'children' => [
                             'Accounts Payable' => ['code' => '2001'],
                             'Tax Payable' => ['code' => '2002'],
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ],
             'Equity' => [
                 'type' => 'equity',
@@ -60,7 +60,7 @@ class AccountSeeder extends Seeder
                 'children' => [
                     'Capital' => ['code' => '3001'],
                     'Retained Earnings' => ['code' => '3002'],
-                ]
+                ],
             ],
             'Income' => [
                 'type' => 'income',
@@ -73,9 +73,9 @@ class AccountSeeder extends Seeder
                             'Visa Services' => ['code' => '4002'],
                             'Hotel Booking' => ['code' => '4003'],
                             'Commission Income' => ['code' => '4004'],
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ],
             'Expenses' => [
                 'type' => 'expense',
@@ -89,9 +89,9 @@ class AccountSeeder extends Seeder
                             'Electricity & Water' => ['code' => '5003'],
                             'Internet & Telephone' => ['code' => '5004'],
                             'Office Supplies' => ['code' => '5005'],
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ],
         ];
 

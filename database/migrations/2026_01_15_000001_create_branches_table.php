@@ -4,10 +4,11 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
-        if (!Schema::hasTable('branches')) {
+        if (! Schema::hasTable('branches')) {
             Schema::create('branches', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('agency_id')->constrained('agencies')->cascadeOnDelete();
@@ -22,25 +23,25 @@ return new class extends Migration {
             });
         } else {
             Schema::table('branches', function (Blueprint $table) {
-                if (!Schema::hasColumn('branches', 'agency_id')) {
+                if (! Schema::hasColumn('branches', 'agency_id')) {
                     $table->foreignId('agency_id')->nullable()->after('id');
                 }
-                if (!Schema::hasColumn('branches', 'code')) {
+                if (! Schema::hasColumn('branches', 'code')) {
                     $table->string('code')->nullable()->after('name');
                 }
-                if (!Schema::hasColumn('branches', 'address')) {
+                if (! Schema::hasColumn('branches', 'address')) {
                     $table->string('address')->nullable()->after('code');
                 }
-                if (!Schema::hasColumn('branches', 'phone')) {
+                if (! Schema::hasColumn('branches', 'phone')) {
                     $table->string('phone')->nullable()->after('address');
                 }
-                if (!Schema::hasColumn('branches', 'status')) {
+                if (! Schema::hasColumn('branches', 'status')) {
                     $table->enum('status', ['active', 'inactive'])->default('active')->after('phone');
                 }
-                if (!Schema::hasColumn('branches', 'deleted_at')) {
+                if (! Schema::hasColumn('branches', 'deleted_at')) {
                     $table->softDeletes();
                 }
-                if (!Schema::hasColumn('branches', 'created_at')) {
+                if (! Schema::hasColumn('branches', 'created_at')) {
                     $table->timestamps();
                 }
             });
@@ -52,4 +53,3 @@ return new class extends Migration {
         Schema::dropIfExists('branches');
     }
 };
-

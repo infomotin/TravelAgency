@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Ticket;
 use App\Models\Airline;
 use App\Models\Party;
 use App\Models\Passport;
-use Illuminate\Support\Facades\DB;
+use App\Models\Ticket;
 use App\Services\CommissionService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TicketController extends Controller
 {
@@ -62,6 +62,7 @@ class TicketController extends Controller
         $validated = $request->validate([
             'client_id' => ['nullable', 'integer', 'exists:parties,id'],
             'employee_id' => ['nullable', 'integer', 'exists:employees,id'],
+            'invoice_no' => ['nullable', 'string', 'max:100', 'unique:tickets,invoice_no'],
             'airline_id' => ['required', 'integer', 'exists:airlines,id'],
             'from_airport_id' => ['nullable', 'integer', 'exists:airports,id'],
             'to_airport_id' => ['nullable', 'integer', 'exists:airports,id'],
@@ -122,6 +123,11 @@ class TicketController extends Controller
 
         $validated['agency_id'] = app('currentAgency')->id;
 
+        $invoiceNo = trim($validated['invoice_no'] ?? '');
+        if ($invoiceNo === '') {
+            $validated['invoice_no'] = $this->generateInvoiceNumber($validated['agency_id']);
+        }
+
         $fare = (float) ($validated['fare'] ?? 0);
         $baseFare = (float) ($validated['base_fare'] ?? 0);
         $tax = (float) ($validated['tax'] ?? 0);
@@ -159,5 +165,45 @@ class TicketController extends Controller
         $ticket = Ticket::create($validated);
 
         return redirect()->route('tickets.index')->with('success', 'Air ticket invoice created successfully.');
+    }
+
+    public function invoice(Ticket $ticket)
+    {
+        if ($ticket->agency_id !== app('currentAgency')->id) {
+            abort(404);
+        }
+
+        $ticket->load('client', 'airline');
+
+        if (! $ticket->invoice_no && $ticket->agency_id) {
+            $ticket->invoice_no = $this->generateInvoiceNumber($ticket->agency_id);
+            $ticket->save();
+        }
+
+        return view('tickets.invoice', compact('ticket'));
+    }
+
+    protected function generateInvoiceNumber(int $agencyId): string
+    {
+        $today = now()->format('Ymd');
+        $prefix = 'TICKET-'.$today.'-';
+
+        $lastInvoice = DB::table('tickets')
+            ->where('agency_id', $agencyId)
+            ->where('invoice_no', 'like', $prefix.'%')
+            ->orderBy('invoice_no', 'desc')
+            ->value('invoice_no');
+
+        $nextNumber = 1;
+
+        if ($lastInvoice) {
+            $parts = explode('-', $lastInvoice);
+            $lastSeq = (int) end($parts);
+            if ($lastSeq > 0) {
+                $nextNumber = $lastSeq + 1;
+            }
+        }
+
+        return $prefix.str_pad((string) $nextNumber, 4, '0', STR_PAD_LEFT);
     }
 }

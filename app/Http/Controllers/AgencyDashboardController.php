@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Employee;
-use App\Models\Ticket;
 use App\Models\Payslip;
+use App\Models\Ticket;
 use Illuminate\Http\Request;
 
 class AgencyDashboardController extends Controller
@@ -21,7 +21,7 @@ class AgencyDashboardController extends Controller
         })->where('status', 'approved')->where('month', $month)->count();
 
         $ticketSales = Ticket::where('agency_id', $agency->id)
-            ->whereBetween('issue_date', [$month . '-01', date('Y-m-t', strtotime($month . '-01'))])
+            ->whereBetween('issue_date', [$month.'-01', date('Y-m-t', strtotime($month.'-01'))])
             ->selectRaw('SUM(fare + tax) as total_sales, SUM(profit_loss) as total_profit')
             ->first();
 
@@ -37,4 +37,3 @@ class AgencyDashboardController extends Controller
         ]);
     }
 }
-

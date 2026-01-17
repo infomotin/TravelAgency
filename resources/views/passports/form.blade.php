@@ -67,6 +67,16 @@
             @endforeach
         </select>
     </div>
+    <div class="col-md-6">
+        <label class="form-label">Passport Status</label>
+        <select name="passport_status_id" class="form-select">
+            <option value="">Select passport status</option>
+            @php $statusId = old('passport_status_id', $passport->passport_status_id ?? ''); @endphp
+            @foreach(($passportStatuses ?? []) as $status)
+                <option value="{{ $status->id }}" @if($statusId == $status->id) selected @endif>{{ $status->name }}</option>
+            @endforeach
+        </select>
+    </div>
 </div>
 <div class="row mb-3">
     <div class="col-md-4">

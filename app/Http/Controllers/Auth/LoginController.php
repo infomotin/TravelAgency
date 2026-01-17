@@ -34,6 +34,7 @@ class LoginController extends Controller
             if ($user && method_exists($user, 'hasRole') && $user->hasRole('admin')) {
                 return redirect()->intended(route('admin.dashboard'));
             }
+
             return redirect()->intended(route('agency.dashboard'));
         }
         LoginActivity::create([
@@ -42,6 +43,7 @@ class LoginController extends Controller
             'user_agent' => $request->userAgent(),
             'status' => $status,
         ]);
+
         return back()->withErrors([
             'email' => 'Invalid credentials.',
         ]);
@@ -52,6 +54,7 @@ class LoginController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return redirect('/');
     }
 }

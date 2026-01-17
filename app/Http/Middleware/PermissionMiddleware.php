@@ -11,13 +11,13 @@ class PermissionMiddleware
     public function handle(Request $request, Closure $next, string $permission): Response
     {
         $user = $request->user();
-        if (!$user) {
+        if (! $user) {
             abort(403);
         }
-        if (!$user->hasPermission($permission)) {
+        if (! $user->hasPermission($permission)) {
             abort(403);
         }
+
         return $next($request);
     }
 }
-

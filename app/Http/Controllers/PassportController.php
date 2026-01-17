@@ -4,11 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Airline;
 use App\Models\Passport;
-use App\Models\PassportAttachment;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class PassportController extends Controller
 {
@@ -23,17 +22,22 @@ class PassportController extends Controller
 
     public function setup()
     {
+        $agencyId = app('currentAgency')->id;
         $countries = DB::table('countries')->orderBy('name')->get();
         $airlines = Airline::orderBy('name')->get();
         $airports = DB::table('airports')->orderBy('name')->get();
         $ticketAgencies = DB::table('ticket_agencies')->orderBy('name')->get();
         $currencies = DB::table('currencies')->orderBy('code')->get();
         $localAgents = DB::table('local_agents')
-            ->where('agency_id', app('currentAgency')->id)
+            ->where('agency_id', $agencyId)
+            ->orderBy('name')
+            ->get();
+        $passportStatuses = DB::table('passport_statuses')
+            ->where('agency_id', $agencyId)
             ->orderBy('name')
             ->get();
 
-        return view('passports.setup', compact('countries', 'airlines', 'airports', 'ticketAgencies', 'currencies', 'localAgents'));
+        return view('passports.setup', compact('countries', 'airlines', 'airports', 'ticketAgencies', 'currencies', 'localAgents', 'passportStatuses'));
     }
 
     public function storeCountry(Request $request)
@@ -150,7 +154,12 @@ class PassportController extends Controller
             ->where('agency_id', app('currentAgency')->id)
             ->orderBy('name')
             ->get();
-        return view('passports.create', compact('countries', 'airlines', 'airports', 'ticketAgencies', 'currencies', 'localAgents'));
+        $passportStatuses = \Illuminate\Support\Facades\DB::table('passport_statuses')
+            ->where('agency_id', app('currentAgency')->id)
+            ->orderBy('name')
+            ->get();
+
+        return view('passports.create', compact('countries', 'airlines', 'airports', 'ticketAgencies', 'currencies', 'localAgents', 'passportStatuses'));
     }
 
     public function store(Request $request)
@@ -179,6 +188,7 @@ class PassportController extends Controller
             'entry_charge' => 'nullable|numeric|min:0',
             'person_commission' => 'nullable|numeric|min:0',
             'is_free' => 'nullable|boolean',
+            'passport_status_id' => 'nullable|integer|exists:passport_statuses,id',
         ]);
 
         $path = null;
@@ -244,6 +254,7 @@ class PassportController extends Controller
             'local_agent_commission_type' => $commissionType,
             'local_agent_commission_value' => $commissionValue,
             'local_agent_commission_amount' => $agentCommissionAmount,
+            'passport_status_id' => $validated['passport_status_id'] ?? null,
         ]);
 
         if ($request->hasFile('front')) {
@@ -314,6 +325,7 @@ class PassportController extends Controller
     public function barcode(Passport $passport)
     {
         $this->authorizeAgency($passport);
+
         return view('passports.barcode', compact('passport'));
     }
 
@@ -341,23 +353,23 @@ class PassportController extends Controller
             ->leftJoin('countries', 'passports.country_id', '=', 'countries.id')
             ->where('passports.agency_id', $agencyId);
 
-        if (!empty($filters['from_date'])) {
+        if (! empty($filters['from_date'])) {
             $query->whereDate('passports.issue_date', '>=', $filters['from_date']);
         }
 
-        if (!empty($filters['to_date'])) {
+        if (! empty($filters['to_date'])) {
             $query->whereDate('passports.issue_date', '<=', $filters['to_date']);
         }
 
-        if (!empty($filters['purpose'])) {
+        if (! empty($filters['purpose'])) {
             $query->where('passports.purpose', $filters['purpose']);
         }
 
-        if (!empty($filters['local_agent_name'])) {
+        if (! empty($filters['local_agent_name'])) {
             $query->where('passports.local_agent_name', $filters['local_agent_name']);
         }
 
-        if (!empty($filters['country_id'])) {
+        if (! empty($filters['country_id'])) {
             $query->where('passports.country_id', $filters['country_id']);
         }
 
@@ -402,23 +414,23 @@ class PassportController extends Controller
             ->leftJoin('countries', 'passports.country_id', '=', 'countries.id')
             ->where('passports.agency_id', $agencyId);
 
-        if (!empty($filters['from_date'])) {
+        if (! empty($filters['from_date'])) {
             $query->whereDate('passports.issue_date', '>=', $filters['from_date']);
         }
 
-        if (!empty($filters['to_date'])) {
+        if (! empty($filters['to_date'])) {
             $query->whereDate('passports.issue_date', '<=', $filters['to_date']);
         }
 
-        if (!empty($filters['purpose'])) {
+        if (! empty($filters['purpose'])) {
             $query->where('passports.purpose', $filters['purpose']);
         }
 
-        if (!empty($filters['local_agent_name'])) {
+        if (! empty($filters['local_agent_name'])) {
             $query->where('passports.local_agent_name', $filters['local_agent_name']);
         }
 
-        if (!empty($filters['country_id'])) {
+        if (! empty($filters['country_id'])) {
             $query->where('passports.country_id', $filters['country_id']);
         }
 
@@ -444,13 +456,13 @@ class PassportController extends Controller
         ])->setPaper('a4', 'portrait');
 
         $nameParts = [];
-        if (!empty($filters['from_date']) || !empty($filters['to_date'])) {
-            $nameParts[] = ($filters['from_date'] ?? 'from') . '-' . ($filters['to_date'] ?? 'to');
+        if (! empty($filters['from_date']) || ! empty($filters['to_date'])) {
+            $nameParts[] = ($filters['from_date'] ?? 'from').'-'.($filters['to_date'] ?? 'to');
         }
-        if (!empty($filters['purpose'])) {
+        if (! empty($filters['purpose'])) {
             $nameParts[] = $filters['purpose'];
         }
-        $fileName = 'passport-report-' . (empty($nameParts) ? 'all' : implode('-', $nameParts)) . '.pdf';
+        $fileName = 'passport-report-'.(empty($nameParts) ? 'all' : implode('-', $nameParts)).'.pdf';
 
         return $pdf->download($fileName);
     }
@@ -462,7 +474,7 @@ class PassportController extends Controller
 
         $passports = Passport::where('passports.agency_id', app('currentAgency')->id)
             ->whereNotNull('passports.local_agent_id')
-            ->whereBetween('passports.created_at', [$fromDate . ' 00:00:00', $toDate . ' 23:59:59'])
+            ->whereBetween('passports.created_at', [$fromDate.' 00:00:00', $toDate.' 23:59:59'])
             ->leftJoin('countries', 'passports.country_id', '=', 'countries.id')
             ->select('passports.*', 'countries.name as country_name')
             ->orderBy('passports.local_agent_name')
@@ -473,10 +485,10 @@ class PassportController extends Controller
         // Group by Local Agent -> Country -> Month
         $reportData = $passports->groupBy('local_agent_id')->map(function ($agentPassports) {
             $agentName = $agentPassports->first()->local_agent_name ?? 'Unknown Agent';
-            
+
             $byCountry = $agentPassports->groupBy('country_id')->map(function ($countryPassports) {
                 $countryName = $countryPassports->first()->country_name ?? 'Unknown Country';
-                
+
                 $byMonth = $countryPassports->groupBy(function ($item) {
                     return \Carbon\Carbon::parse($item->created_at)->format('Y-m');
                 })->map(function ($monthPassports) {
@@ -502,6 +514,7 @@ class PassportController extends Controller
 
         if ($request->has('pdf')) {
             $pdf = Pdf::loadView('passports.local_agent_report_pdf', compact('reportData', 'fromDate', 'toDate'));
+
             return $pdf->download('local_agent_commission_report.pdf');
         }
 
@@ -520,7 +533,12 @@ class PassportController extends Controller
             ->where('agency_id', app('currentAgency')->id)
             ->orderBy('name')
             ->get();
-        return view('passports.edit', compact('passport', 'countries', 'airlines', 'airports', 'ticketAgencies', 'currencies', 'localAgents'));
+        $passportStatuses = \Illuminate\Support\Facades\DB::table('passport_statuses')
+            ->where('agency_id', app('currentAgency')->id)
+            ->orderBy('name')
+            ->get();
+
+        return view('passports.edit', compact('passport', 'countries', 'airlines', 'airports', 'ticketAgencies', 'currencies', 'localAgents', 'passportStatuses'));
     }
 
     public function update(Request $request, Passport $passport)
@@ -537,7 +555,7 @@ class PassportController extends Controller
             'airline_id' => 'nullable|integer|exists:airlines,id',
             'ticket_agency_id' => 'nullable|integer|exists:ticket_agencies,id',
             'currency_id' => 'nullable|integer|exists:currencies,id',
-            'passport_no' => 'required|string|max:50|unique:passports,passport_no,' . $passport->id,
+            'passport_no' => 'required|string|max:50|unique:passports,passport_no,'.$passport->id,
             'issue_date' => 'nullable|date',
             'expiry_date' => 'required|date',
             'purpose' => 'nullable|string|max:100',
@@ -551,6 +569,7 @@ class PassportController extends Controller
             'entry_charge' => 'nullable|numeric|min:0',
             'person_commission' => 'nullable|numeric|min:0',
             'is_free' => 'nullable|boolean',
+            'passport_status_id' => 'nullable|integer|exists:passport_statuses,id',
         ]);
 
         $path = $passport->document_path;
@@ -569,7 +588,7 @@ class PassportController extends Controller
         $entryCharge = $validated['entry_charge'] ?? 0;
         $isFree = (bool) ($validated['is_free'] ?? false);
 
-        if (!$invoiceNo) {
+        if (! $invoiceNo) {
             $invoiceNo = $this->generateInvoiceNumber(app('currentAgency')->id);
             $invoiceDate = now()->toDateString();
         }
@@ -623,6 +642,7 @@ class PassportController extends Controller
             'local_agent_commission_type' => $commissionType,
             'local_agent_commission_value' => $commissionValue,
             'local_agent_commission_amount' => $agentCommissionAmount,
+            'passport_status_id' => $validated['passport_status_id'] ?? null,
         ]);
 
         if ($request->hasFile('front')) {
@@ -697,6 +717,7 @@ class PassportController extends Controller
         $this->authorizeAgency($passport);
         Storage::disk('public')->delete($attachment->file_path);
         $attachment->delete();
+
         return back()->with('success', 'Attachment deleted.');
     }
 
@@ -711,7 +732,7 @@ class PassportController extends Controller
     {
         $this->authorizeAgency($passport);
 
-        if (!$passport->invoice_no) {
+        if (! $passport->invoice_no) {
             $passport->invoice_no = $this->generateInvoiceNumber(app('currentAgency')->id);
             $passport->invoice_date = now()->toDateString();
             $passport->save();
@@ -723,11 +744,11 @@ class PassportController extends Controller
     protected function generateInvoiceNumber(int $agencyId): string
     {
         $today = now()->format('Ymd');
-        $prefix = 'INV-' . $today . '-';
+        $prefix = 'INV-'.$today.'-';
 
         $lastInvoice = DB::table('passports')
             ->where('agency_id', $agencyId)
-            ->where('invoice_no', 'like', $prefix . '%')
+            ->where('invoice_no', 'like', $prefix.'%')
             ->orderBy('invoice_no', 'desc')
             ->value('invoice_no');
 
@@ -741,6 +762,6 @@ class PassportController extends Controller
             }
         }
 
-        return $prefix . str_pad((string) $nextNumber, 4, '0', STR_PAD_LEFT);
+        return $prefix.str_pad((string) $nextNumber, 4, '0', STR_PAD_LEFT);
     }
 }

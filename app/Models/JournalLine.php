@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class JournalLine extends Model
 {
@@ -11,4 +11,3 @@ class JournalLine extends Model
 
     protected $fillable = ['journal_entry_id', 'account_id', 'debit', 'credit'];
 }
-

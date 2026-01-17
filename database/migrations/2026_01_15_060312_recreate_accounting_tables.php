@@ -30,7 +30,7 @@ return new class extends Migration
             $table->boolean('is_system')->default(false);
             $table->timestamps();
             $table->softDeletes();
-            
+
             $table->unique(['agency_id', 'code']);
         });
 

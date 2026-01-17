@@ -4,7 +4,7 @@
 <h1 class="h3 mb-3">Passport Setup</h1>
 <div class="row g-3">
     <div class="col-md-6">
-        <div class="card h-100" id="airports">
+        <div class="card h-100" id="countries">
             <div class="card-header">Countries</div>
             <div class="card-body">
                 <form action="{{ route('passports.setup.countries.store') }}" method="post" class="row g-2 mb-3">
@@ -45,7 +45,7 @@
         </div>
     </div>
     <div class="col-md-6">
-        <div class="card h-100">
+        <div class="card h-100" id="airports">
             <div class="card-header">Currencies</div>
             <div class="card-body">
                 <form action="{{ route('passports.setup.currencies.store') }}" method="post" class="row g-2 mb-3">

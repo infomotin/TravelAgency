@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Accounting;
 
 use App\Http\Controllers\Controller;
-use App\Models\Transaction;
 use App\Models\Account;
 use App\Models\Party;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 
 class TransactionController extends Controller
@@ -37,7 +37,7 @@ class TransactionController extends Controller
             ->where('status', 'active')
             ->orderBy('name')
             ->get();
-            
+
         return view('accounting.transactions.create', compact('accounts', 'parties'));
     }
 
@@ -55,29 +55,29 @@ class TransactionController extends Controller
             'lines.*.credit' => 'required|numeric|min:0',
             'lines.*.description' => 'nullable|string',
         ]);
-        
+
         // Validate balance
         $totalDebit = collect($validated['lines'])->sum('debit');
         $totalCredit = collect($validated['lines'])->sum('credit');
-        
+
         if (abs($totalDebit - $totalCredit) > 0.01) {
-            return back()->withErrors(['lines' => 'Debits must equal Credits. Difference: ' . abs($totalDebit - $totalCredit)])->withInput();
+            return back()->withErrors(['lines' => 'Debits must equal Credits. Difference: '.abs($totalDebit - $totalCredit)])->withInput();
         }
 
         // Generate voucher number
         $prefix = strtoupper(substr($validated['type'], 0, 2)); // PA, RE, JO, CO
-        
+
         $lastVoucher = Transaction::where('agency_id', app('currentAgency')->id)
-            ->where('voucher_no', 'like', $prefix . '%')
+            ->where('voucher_no', 'like', $prefix.'%')
             ->latest('id')
             ->first();
-            
+
         $number = 1;
         if ($lastVoucher) {
             // Extract number from PA000001
             $number = intval(substr($lastVoucher->voucher_no, 2)) + 1;
         }
-        $voucherNo = $prefix . str_pad($number, 6, '0', STR_PAD_LEFT);
+        $voucherNo = $prefix.str_pad($number, 6, '0', STR_PAD_LEFT);
 
         $transaction = Transaction::create([
             'agency_id' => app('currentAgency')->id,
@@ -103,6 +103,7 @@ class TransactionController extends Controller
     public function show(Transaction $transaction)
     {
         $transaction->load('lines.account', 'creator', 'party');
+
         return view('accounting.transactions.show', compact('transaction'));
     }
 
@@ -116,7 +117,7 @@ class TransactionController extends Controller
             ->where('status', 'active')
             ->orderBy('name')
             ->get();
-            
+
         return view('accounting.transactions.edit', compact('transaction', 'accounts', 'parties'));
     }
 
@@ -134,10 +135,10 @@ class TransactionController extends Controller
             'lines.*.credit' => 'required|numeric|min:0',
             'lines.*.description' => 'nullable|string',
         ]);
-        
+
         $totalDebit = collect($validated['lines'])->sum('debit');
         $totalCredit = collect($validated['lines'])->sum('credit');
-        
+
         if (abs($totalDebit - $totalCredit) > 0.01) {
             return back()->withErrors(['lines' => 'Debits must equal Credits.'])->withInput();
         }

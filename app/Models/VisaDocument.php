@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class VisaDocument extends Model
 {
@@ -28,4 +28,3 @@ class VisaDocument extends Model
         return $this->belongsTo(VisaTypeDocument::class, 'visa_type_document_id');
     }
 }
-

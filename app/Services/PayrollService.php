@@ -16,7 +16,7 @@ class PayrollService
             $structure = SalaryStructure::where('employee_id', $employee->id)->firstOrFail();
             $gross = $structure->basic + $structure->house_rent + $structure->medical + $structure->transport;
 
-            $start = $month . '-01';
+            $start = $month.'-01';
             $end = date('Y-m-t', strtotime($start));
 
             $attendance = AttendanceRecord::where('employee_id', $employee->id)
@@ -51,4 +51,3 @@ class PayrollService
         });
     }
 }
-

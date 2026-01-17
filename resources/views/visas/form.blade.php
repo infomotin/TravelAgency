@@ -13,7 +13,7 @@
             @endforeach
         </select>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-3">
         <label class="form-label">Country</label>
         <select name="country_id" class="form-select" required>
             <option value="">Select country</option>
@@ -22,6 +22,20 @@
             @endphp
             @foreach($countries as $c)
                 <option value="{{ $c->id }}" @if($selectedCountry == $c->id) selected @endif>{{ $c->name }}</option>
+            @endforeach
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Airline</label>
+        <select name="airline_id" class="form-select">
+            <option value="">Select airline</option>
+            @php
+                $selectedAirline = old('airline_id', $visa->airline_id ?? '');
+            @endphp
+            @foreach($airlines as $airline)
+                <option value="{{ $airline->id }}" @if($selectedAirline == $airline->id) selected @endif>
+                    {{ $airline->name }}
+                </option>
             @endforeach
         </select>
     </div>

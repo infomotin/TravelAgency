@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Visa extends Model
 {
@@ -12,6 +12,7 @@ class Visa extends Model
 
     protected $fillable = [
         'passport_id',
+        'airline_id',
         'country_id',
         'visa_type',
         'issue_date',
@@ -24,6 +25,11 @@ class Visa extends Model
         'invoice_no',
         'invoice_date',
     ];
+
+    public function airline()
+    {
+        return $this->belongsTo(Airline::class);
+    }
 
     public function passport()
     {

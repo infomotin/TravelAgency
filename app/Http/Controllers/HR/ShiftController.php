@@ -21,6 +21,7 @@ class ShiftController extends Controller
         $shifts = Shift::where('agency_id', app('currentAgency')->id)
             ->orderBy('name')
             ->paginate(20);
+
         return view('shifts.index', compact('shifts'));
     }
 
@@ -39,6 +40,7 @@ class ShiftController extends Controller
         ]);
         $validated['agency_id'] = app('currentAgency')->id;
         Shift::create($validated);
+
         return redirect()->route('shifts.index');
     }
 
@@ -56,12 +58,14 @@ class ShiftController extends Controller
             'grace_minutes' => ['nullable', 'integer', 'min:0'],
         ]);
         $shift->update($validated);
+
         return redirect()->route('shifts.index');
     }
 
     public function destroy(Shift $shift)
     {
         $shift->delete();
+
         return redirect()->route('shifts.index');
     }
 }

@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Passport extends Model
 {
@@ -35,6 +35,7 @@ class Passport extends Model
         'local_agent_commission_amount',
         'invoice_no',
         'invoice_date',
+        'passport_status_id',
     ];
 
     public function attachments()
@@ -45,5 +46,10 @@ class Passport extends Model
     public function visas()
     {
         return $this->hasMany(Visa::class);
+    }
+
+    public function status()
+    {
+        return $this->belongsTo(PassportStatus::class, 'passport_status_id');
     }
 }

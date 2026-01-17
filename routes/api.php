@@ -10,4 +10,3 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('employees/{employee}/payslips/generate', [PayrollController::class, 'generate']);
     Route::post('tickets', [TicketController::class, 'store']);
 });
-

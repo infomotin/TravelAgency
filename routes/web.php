@@ -1,36 +1,43 @@
 <?php
 
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\AdminDashboardController;
-use App\Http\Controllers\AgencyDashboardController;
-use App\Http\Controllers\HR\EmployeeController;
-use App\Http\Controllers\HR\DepartmentController;
-use App\Http\Controllers\HR\DesignationController;
-use App\Http\Controllers\HR\ShiftController;
-use App\Http\Controllers\HR\LeavePolicyController;
-use App\Http\Controllers\HR\HRReportController;
-use App\Http\Controllers\HR\HolidayController;
-use App\Http\Controllers\HR\CalendarController;
-use App\Http\Controllers\HR\SalaryStructureController;
-use App\Http\Controllers\HR\AdvanceController;
-use App\Http\Controllers\HR\PayslipController;
-use App\Http\Controllers\HR\EmployeeLeaveController;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\PermissionController;
-use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\Accounting\AccountController as AccountingAccountController;
-use App\Http\Controllers\Accounting\TransactionController as AccountingTransactionController;
 use App\Http\Controllers\Accounting\AccountingReportController;
 use App\Http\Controllers\Accounting\BillController;
+use App\Http\Controllers\Accounting\TransactionController as AccountingTransactionController;
+use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\AdminUserController;
+use App\Http\Controllers\AgencyDashboardController;
+use App\Http\Controllers\AirportController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\ClientCategoryController;
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\HR\AdvanceController;
+use App\Http\Controllers\HR\CalendarController;
+use App\Http\Controllers\HR\DepartmentController;
+use App\Http\Controllers\HR\DesignationController;
+use App\Http\Controllers\HR\EmployeeController;
+use App\Http\Controllers\HR\EmployeeLeaveController;
+use App\Http\Controllers\HR\HolidayController;
+use App\Http\Controllers\HR\HRReportController;
+use App\Http\Controllers\HR\LeavePolicyController;
+use App\Http\Controllers\HR\PayslipController;
+use App\Http\Controllers\HR\SalaryStructureController;
+use App\Http\Controllers\HR\ShiftController;
 use App\Http\Controllers\PassportController;
+use App\Http\Controllers\PassportStatusController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\TicketController;
+use App\Http\Controllers\TransportTypeController;
 use App\Http\Controllers\VisaController;
 use App\Http\Controllers\VisaSetupController;
-use App\Http\Controllers\TicketController;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 Route::withoutMiddleware([\App\Http\Middleware\SetCurrentAgency::class])->get('/debug', function (Request $request) {
-    return "Host: " . $request->getHost();
+    return 'Host: '.$request->getHost();
 });
 
 Route::get('/', function () {
@@ -56,7 +63,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('designations', DesignationController::class)->except('show');
     Route::resource('shifts', ShiftController::class)->except('show');
     Route::resource('leave_policies', LeavePolicyController::class)->except('show');
-    Route::resource('employee_leaves', EmployeeLeaveController::class)->only(['index','create','store','update','destroy']);
+    Route::resource('employee_leaves', EmployeeLeaveController::class)->only(['index', 'create', 'store', 'update', 'destroy']);
     Route::resource('holidays', HolidayController::class)->except('show');
     Route::get('calendar', [CalendarController::class, 'index'])->name('calendar.index');
     Route::post('calendar/generate', [CalendarController::class, 'generate'])->name('calendar.generate');
@@ -112,7 +119,19 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('visas/setup', [VisaSetupController::class, 'index'])->name('visas.setup');
     Route::post('visas/setup/types', [VisaSetupController::class, 'storeVisaType'])->name('visas.setup.types.store');
     Route::post('visas/setup/documents', [VisaSetupController::class, 'storeVisaTypeDocument'])->name('visas.setup.documents.store');
+    Route::get('tickets/{ticket}/invoice', [TicketController::class, 'invoice'])->name('tickets.invoice');
     Route::resource('tickets', TicketController::class)->only(['index', 'create', 'store']);
+    Route::resource('client-categories', ClientCategoryController::class)->only(['index', 'store', 'update', 'destroy'])->names('client_categories');
+    Route::get('airports/config', [AirportController::class, 'index'])->name('airports.config');
+    Route::resource('products', ProductController::class)->only(['index', 'store', 'update', 'destroy']);
+    Route::resource('transport-types', TransportTypeController::class)->only(['index', 'store', 'update', 'destroy'])->names('transport_types');
+    Route::resource('passport-statuses', PassportStatusController::class)->only(['index', 'store', 'update', 'destroy'])->names('passport_statuses');
+    Route::resource('contacts', ContactController::class)->only(['index', 'store', 'update', 'destroy']);
+    Route::get('contacts/{contact}/gifts', [ContactController::class, 'gifts'])->name('contacts.gifts.index');
+    Route::post('contacts/{contact}/gifts', [ContactController::class, 'storeGift'])->name('contacts.gifts.store');
+    Route::put('contacts/{contact}/gifts/{gift}', [ContactController::class, 'updateGift'])->name('contacts.gifts.update');
+    Route::delete('contacts/{contact}/gifts/{gift}', [ContactController::class, 'destroyGift'])->name('contacts.gifts.destroy');
+    Route::resource('companies', CompanyController::class)->only(['index', 'store', 'update', 'destroy']);
 });
 
 Route::middleware(['auth'])->group(function () {

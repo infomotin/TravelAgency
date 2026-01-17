@@ -12,13 +12,13 @@ class CommissionService
             ->where('min_fare', '<=', $fare)
             ->orderByDesc('min_fare')
             ->first();
-        if (!$rule) {
+        if (! $rule) {
             return 0.0;
         }
         if ($rule->type === 'percentage') {
             return round(($fare * $rule->value) / 100, 2);
         }
+
         return round($rule->value, 2);
     }
 }
-

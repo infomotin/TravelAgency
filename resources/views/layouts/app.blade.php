@@ -286,7 +286,7 @@
                 <div class="module-items" data-module="travel">
                     <a href="{{ route('passports.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('passports.index') || request()->routeIs('passports.show') || request()->routeIs('passports.edit') || request()->routeIs('passports.create') ? 'active' : '' }}">Passports</a>
                     <a href="{{ route('passports.setup') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('passports.setup') ? 'active' : '' }}">Passport Setup</a>
-                    <a href="{{ route('passports.setup') }}#airports" class="list-group-item list-group-item-action ps-4">Airports</a>
+                    <a href="{{ route('airports.config') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('airports.config') ? 'active' : '' }}">Airports</a>
                     <a href="{{ route('passports.setup') }}#local-agents" class="list-group-item list-group-item-action ps-4">Local Agent Setup</a>
                     <a href="{{ route('passports.report') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('passports.report') ? 'active' : '' }}">Passport Report</a>
                     <a href="{{ route('passports.local_agent_report') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('passports.local_agent_report') ? 'active' : '' }}">Local Agent Report</a>
@@ -302,19 +302,21 @@
                     <a href="#" class="list-group-item list-group-item-action ps-4">App Config</a>
                     <a href="#" class="list-group-item list-group-item-action ps-4">Signature Details</a>
                     <a href="{{ route('agencies.edit', app('currentAgency')->id) }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('agencies.edit') ? 'active' : '' }}">Profile Setting</a>
-                    <a href="#" class="list-group-item list-group-item-action ps-4">Client Category</a>
+                    <a href="{{ route('client_categories.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('client_categories.*') ? 'active' : '' }}">Client Category</a>
                     <a href="{{ route('passports.setup') }}#airports" class="list-group-item list-group-item-action ps-4">Airports</a>
-                    <a href="#" class="list-group-item list-group-item-action ps-4">Products</a>
+                    <a href="{{ route('products.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('products.*') ? 'active' : '' }}">Products</a>
                     <a href="{{ route('visas.setup') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('visas.setup') ? 'active' : '' }}">Visa Type</a>
                     <a href="{{ route('departments.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('departments.*') ? 'active' : '' }}">Departments</a>
                     <a href="#" class="list-group-item list-group-item-action ps-4">Room Types</a>
-                    <a href="#" class="list-group-item list-group-item-action ps-4">Transport Types</a>
+                    <a href="{{ route('transport_types.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('transport_types.*') ? 'active' : '' }}">Transport Types</a>
                     <a href="{{ route('designations.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('designations.*') ? 'active' : '' }}">Designation</a>
                     <a href="{{ route('employees.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('employees.*') ? 'active' : '' }}">Employee</a>
                     <a href="{{ route('admin.users.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">Users</a>
                     <a href="#" class="list-group-item list-group-item-action ps-4">Tour Itinerary</a>
-                    <a href="#" class="list-group-item list-group-item-action ps-4">Passport Status</a>
+                    <a href="{{ route('passport_statuses.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('passport_statuses.*') ? 'active' : '' }}">Passport Status</a>
                     <a href="#" class="list-group-item list-group-item-action ps-4">Groups</a>
+                    <a href="{{ route('contacts.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('contacts.*') ? 'active' : '' }}">Contacts</a>
+                    <a href="{{ route('companies.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('companies.*') ? 'active' : '' }}">Companies</a>
                 </div>
                 @endif
                 @can('hr_setup.view')
@@ -379,29 +381,34 @@
             });
         });
 
-        $('.module-items').hide();
+        (function () {
+            var moduleItems = document.querySelectorAll('.module-items');
+            moduleItems.forEach(function (el) {
+                el.style.display = 'none';
+            });
 
-        var initialModule = null;
-        $('.module-items').each(function () {
-            if ($(this).find('.active').length) {
-                initialModule = $(this).data('module');
-            }
-        });
+            moduleItems.forEach(function (el) {
+                if (el.querySelector('.active')) {
+                    el.style.display = '';
+                }
+            });
 
-        if (initialModule) {
-            $('.module-items[data-module="' + initialModule + '"]').show();
-        }
-
-        $('.module-toggle').on('click', function () {
-            var module = $(this).data('module');
-
-            if ($('.module-items[data-module="' + module + '"]').is(':visible')) {
-                $('.module-items[data-module="' + module + '"]').slideUp(150);
-            } else {
-                $('.module-items').slideUp(150);
-                $('.module-items[data-module="' + module + '"]').slideDown(150);
-            }
-        });
+            var toggles = document.querySelectorAll('.module-toggle');
+            toggles.forEach(function (toggle) {
+                toggle.addEventListener('click', function () {
+                    var module = this.getAttribute('data-module');
+                    var items = document.querySelector('.module-items[data-module="' + module + '"]');
+                    if (!items) {
+                        return;
+                    }
+                    if (items.style.display === 'none') {
+                        items.style.display = '';
+                    } else {
+                        items.style.display = 'none';
+                    }
+                });
+            });
+        })();
     });
 </script>
 </body>

@@ -4,10 +4,11 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
-        if (!Schema::hasTable('roles')) {
+        if (! Schema::hasTable('roles')) {
             Schema::create('roles', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('agency_id')->nullable()->constrained('agencies')->nullOnDelete()->index();
@@ -18,19 +19,19 @@ return new class extends Migration {
             });
         } else {
             Schema::table('roles', function (Blueprint $table) {
-                if (!Schema::hasColumn('roles', 'agency_id')) {
+                if (! Schema::hasColumn('roles', 'agency_id')) {
                     $table->foreignId('agency_id')->nullable()->after('id');
                 }
-                if (!Schema::hasColumn('roles', 'slug')) {
+                if (! Schema::hasColumn('roles', 'slug')) {
                     $table->string('slug')->nullable()->after('name');
                 }
-                if (!Schema::hasColumn('roles', 'deleted_at')) {
+                if (! Schema::hasColumn('roles', 'deleted_at')) {
                     $table->softDeletes();
                 }
             });
         }
 
-        if (!Schema::hasTable('permissions')) {
+        if (! Schema::hasTable('permissions')) {
             Schema::create('permissions', function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
@@ -40,7 +41,7 @@ return new class extends Migration {
             });
         }
 
-        if (!Schema::hasTable('permission_role')) {
+        if (! Schema::hasTable('permission_role')) {
             Schema::create('permission_role', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('permission_id')->constrained('permissions')->cascadeOnDelete();
@@ -49,7 +50,7 @@ return new class extends Migration {
             });
         }
 
-        if (!Schema::hasTable('role_user')) {
+        if (! Schema::hasTable('role_user')) {
             Schema::create('role_user', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('role_id')->constrained('roles')->cascadeOnDelete();
@@ -58,7 +59,7 @@ return new class extends Migration {
             });
         }
 
-        if (!Schema::hasTable('login_activities')) {
+        if (! Schema::hasTable('login_activities')) {
             Schema::create('login_activities', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
@@ -79,4 +80,3 @@ return new class extends Migration {
         Schema::dropIfExists('roles');
     }
 };
-

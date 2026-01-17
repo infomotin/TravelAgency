@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Employee extends Model
 {
@@ -45,11 +45,33 @@ class Employee extends Model
         'dob' => 'date',
     ];
 
-    public function agency() { return $this->belongsTo(Agency::class); }
-    public function branch() { return $this->belongsTo(Branch::class); }
-    public function user() { return $this->belongsTo(User::class); }
-    public function department() { return $this->belongsTo(Department::class); }
-    public function designation() { return $this->belongsTo(Designation::class); }
-    public function shift() { return $this->belongsTo(Shift::class); }
-}
+    public function agency()
+    {
+        return $this->belongsTo(Agency::class);
+    }
 
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    public function designation()
+    {
+        return $this->belongsTo(Designation::class);
+    }
+
+    public function shift()
+    {
+        return $this->belongsTo(Shift::class);
+    }
+}

@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\HR;
 
 use App\Http\Controllers\Controller;
+use App\Models\AttendanceRecord;
 use App\Models\Employee;
 use App\Models\EmployeeLeave;
 use App\Models\LeavePolicy;
-use App\Models\AttendanceRecord;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 

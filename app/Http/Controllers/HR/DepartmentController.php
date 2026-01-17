@@ -21,6 +21,7 @@ class DepartmentController extends Controller
         $departments = Department::where('agency_id', app('currentAgency')->id)
             ->orderBy('name')
             ->paginate(20);
+
         return view('departments.index', compact('departments'));
     }
 
@@ -36,6 +37,7 @@ class DepartmentController extends Controller
         ]);
         $validated['agency_id'] = app('currentAgency')->id;
         Department::create($validated);
+
         return redirect()->route('departments.index');
     }
 
@@ -50,12 +52,14 @@ class DepartmentController extends Controller
             'name' => ['required', 'string', 'max:255'],
         ]);
         $department->update($validated);
+
         return redirect()->route('departments.index');
     }
 
     public function destroy(Department $department)
     {
         $department->delete();
+
         return redirect()->route('departments.index');
     }
 }

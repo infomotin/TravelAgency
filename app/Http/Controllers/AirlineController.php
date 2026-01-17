@@ -10,6 +10,7 @@ class AirlineController extends Controller
     public function index()
     {
         $airlines = Airline::orderBy('name')->paginate(20);
+
         return view('airlines.index', compact('airlines'));
     }
 
@@ -21,7 +22,7 @@ class AirlineController extends Controller
             'status' => ['required', 'in:active,inactive'],
         ]);
         $airline = Airline::create($validated);
+
         return redirect()->route('airlines.index');
     }
 }
-

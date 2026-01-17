@@ -14,7 +14,7 @@ class TransactionLine extends Model
         'account_id',
         'debit',
         'credit',
-        'description'
+        'description',
     ];
 
     public function transaction()
