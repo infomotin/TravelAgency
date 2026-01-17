@@ -102,6 +102,49 @@
         </div>
     </div>
     </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Visas</span>
+        <a href="{{ route('visas.create', ['passport_id' => $passport->id]) }}" class="btn btn-sm btn-primary">Add Visa</a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-sm align-middle">
+                <thead>
+                <tr>
+                    <th>Country</th>
+                    <th>Visa Type</th>
+                    <th>Issue Date</th>
+                    <th>Expiry Date</th>
+                    <th>Visa Fee</th>
+                    <th>Agent Commission</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                @forelse($passport->visas as $visa)
+                    <tr>
+                        <td>{{ $countryNames[$visa->country_id] ?? '' }}</td>
+                        <td>{{ $visa->visa_type }}</td>
+                        <td>{{ optional($visa->issue_date)->format('Y-m-d') }}</td>
+                        <td>{{ optional($visa->expiry_date)->format('Y-m-d') }}</td>
+                        <td>{{ number_format($visa->visa_fee, 2) }}</td>
+                        <td>{{ number_format($visa->agent_commission, 2) }}</td>
+                        <td class="text-end">
+                            <a href="{{ route('visas.edit', $visa) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">No visas added for this passport.</td>
+                    </tr>
+                @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 <a href="{{ route('passports.edit', $passport) }}" class="btn btn-primary">Edit</a>
 <a href="{{ route('passports.invoice', $passport) }}" class="btn btn-success">Invoice / Receipt</a>
 <a href="{{ route('passports.barcode', $passport) }}" class="btn btn-outline-primary">Barcode</a>

@@ -303,7 +303,12 @@ class PassportController extends Controller
     {
         $this->authorizeAgency($passport);
 
-        return view('passports.show', compact('passport'));
+        $passport->load('attachments', 'visas');
+
+        $countries = DB::table('countries')->orderBy('name')->get();
+        $countryNames = $countries->pluck('name', 'id');
+
+        return view('passports.show', compact('passport', 'countryNames'));
     }
 
     public function barcode(Passport $passport)

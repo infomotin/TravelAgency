@@ -41,4 +41,9 @@ class Passport extends Model
     {
         return $this->hasMany(PassportAttachment::class);
     }
+
+    public function visas()
+    {
+        return $this->hasMany(Visa::class);
+    }
 }

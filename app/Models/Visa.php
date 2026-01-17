@@ -12,10 +12,24 @@ class Visa extends Model
 
     protected $fillable = [
         'passport_id',
+        'country_id',
         'visa_type',
         'issue_date',
         'expiry_date',
+        'visa_fee',
+        'visa_type_id',
+        'agent_id',
+        'agent_commission',
         'document_path',
     ];
-}
 
+    public function passport()
+    {
+        return $this->belongsTo(Passport::class);
+    }
+
+    public function type()
+    {
+        return $this->belongsTo(VisaType::class, 'visa_type_id');
+    }
+}

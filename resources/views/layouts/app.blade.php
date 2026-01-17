@@ -289,6 +289,9 @@
                     <a href="{{ route('passports.setup') }}#local-agents" class="list-group-item list-group-item-action ps-4">Local Agent Setup</a>
                     <a href="{{ route('passports.report') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('passports.report') ? 'active' : '' }}">Passport Report</a>
                     <a href="{{ route('passports.local_agent_report') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('passports.local_agent_report') ? 'active' : '' }}">Local Agent Report</a>
+                    <a href="{{ route('visas.setup') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('visas.setup') ? 'active' : '' }}">Visa Setup</a>
+                    <a href="{{ route('visas.index') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('visas.index') || request()->routeIs('visas.edit') || request()->routeIs('visas.create') ? 'active' : '' }}">Visas</a>
+                    <a href="{{ route('visas.report') }}" class="list-group-item list-group-item-action ps-4 {{ request()->routeIs('visas.report') ? 'active' : '' }}">Visa Report</a>
                 </div>
                 @endif
                 @can('hr_setup.view')
