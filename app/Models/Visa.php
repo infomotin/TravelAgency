@@ -32,4 +32,9 @@ class Visa extends Model
     {
         return $this->belongsTo(VisaType::class, 'visa_type_id');
     }
+
+    public function documents()
+    {
+        return $this->hasMany(VisaDocument::class);
+    }
 }

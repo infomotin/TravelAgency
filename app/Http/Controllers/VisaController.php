@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Passport;
 use App\Models\Visa;
 use App\Models\VisaType;
+use App\Models\VisaTypeDocument;
+use App\Models\VisaDocument;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -47,18 +49,34 @@ class VisaController extends Controller
             ->orderBy('name')
             ->get();
 
-        $visaTypes = collect();
-        $countryId = (int) $request->query('country_id', 0);
-        if ($countryId > 0) {
-            $visaTypes = VisaType::where('country_id', $countryId)
-                ->where('status', 'active')
-                ->orderBy('name')
-                ->get();
-        }
-
         $selectedPassportId = (int) $request->query('passport_id', 0);
 
-        return view('visas.create', compact('countries', 'passports', 'agents', 'visaTypes', 'countryId', 'selectedPassportId'));
+        $countryId = (int) $request->query('country_id', 0);
+        if ($countryId === 0 && $selectedPassportId > 0) {
+            $passportForCountry = Passport::where('agency_id', app('currentAgency')->id)
+                ->where('id', $selectedPassportId)
+                ->first();
+            if ($passportForCountry && $passportForCountry->country_id) {
+                $countryId = (int) $passportForCountry->country_id;
+            }
+        }
+
+        $visaTypes = VisaType::where('status', 'active')
+            ->when($countryId > 0, function ($query) use ($countryId) {
+                $query->where('country_id', $countryId);
+            })
+            ->orderBy('name')
+            ->get();
+
+        $typeDocuments = collect();
+        if ($visaTypes->isNotEmpty()) {
+            $typeDocuments = VisaTypeDocument::whereIn('visa_type_id', $visaTypes->pluck('id'))
+                ->orderBy('name')
+                ->get()
+                ->groupBy('visa_type_id');
+        }
+
+        return view('visas.create', compact('countries', 'passports', 'agents', 'visaTypes', 'typeDocuments', 'countryId', 'selectedPassportId'));
     }
 
     public function store(Request $request)
@@ -72,6 +90,8 @@ class VisaController extends Controller
             'visa_fee' => ['nullable', 'numeric', 'min:0'],
             'agent_id' => ['nullable', 'integer', 'exists:local_agents,id'],
             'document' => ['nullable', 'file', 'max:10240'],
+            'type_documents' => ['nullable', 'array'],
+            'type_documents.*' => ['nullable', 'file', 'max:10240'],
         ]);
 
         $passport = Passport::where('id', $validated['passport_id'])
@@ -110,7 +130,7 @@ class VisaController extends Controller
             }
         }
 
-        Visa::create([
+        $visa = Visa::create([
             'passport_id' => $passport->id,
             'country_id' => $validated['country_id'] ?? null,
             'visa_type' => $visaType->name,
@@ -122,6 +142,26 @@ class VisaController extends Controller
             'agent_commission' => $agentCommissionAmount,
             'document_path' => $path,
         ]);
+
+        if ($request->hasFile('type_documents')) {
+            $allowedIds = VisaTypeDocument::where('visa_type_id', $visaType->id)->pluck('id')->all();
+            foreach ($request->file('type_documents') as $docId => $file) {
+                if (!$file) {
+                    continue;
+                }
+                if (!in_array((int) $docId, $allowedIds, true)) {
+                    continue;
+                }
+                $storedPath = $file->store('visa_documents', 'public');
+                $visa->documents()->create([
+                    'visa_type_document_id' => (int) $docId,
+                    'file_path' => $storedPath,
+                    'file_name' => $file->getClientOriginalName(),
+                    'file_type' => $file->getClientMimeType(),
+                    'file_size' => $file->getSize(),
+                ]);
+            }
+        }
 
         return redirect()->route('visas.index')->with('success', 'Visa record created successfully.');
     }
@@ -151,7 +191,15 @@ class VisaController extends Controller
                 ->get();
         }
 
-        return view('visas.edit', compact('visa', 'countries', 'passports', 'agents', 'visaTypes'));
+        $typeDocuments = collect();
+        if ($visaTypes->isNotEmpty()) {
+            $typeDocuments = VisaTypeDocument::whereIn('visa_type_id', $visaTypes->pluck('id'))
+                ->orderBy('name')
+                ->get()
+                ->groupBy('visa_type_id');
+        }
+
+        return view('visas.edit', compact('visa', 'countries', 'passports', 'agents', 'visaTypes', 'typeDocuments'));
     }
 
     public function update(Request $request, Visa $visa)
@@ -167,6 +215,8 @@ class VisaController extends Controller
             'visa_fee' => ['nullable', 'numeric', 'min:0'],
             'agent_id' => ['nullable', 'integer', 'exists:local_agents,id'],
             'document' => ['nullable', 'file', 'max:10240'],
+            'type_documents' => ['nullable', 'array'],
+            'type_documents.*' => ['nullable', 'file', 'max:10240'],
         ]);
 
         $passport = Passport::where('id', $validated['passport_id'])
@@ -221,6 +271,26 @@ class VisaController extends Controller
             'agent_commission' => $agentCommissionAmount,
             'document_path' => $path,
         ]);
+
+        if ($request->hasFile('type_documents')) {
+            $allowedIds = VisaTypeDocument::where('visa_type_id', $visaType->id)->pluck('id')->all();
+            foreach ($request->file('type_documents') as $docId => $file) {
+                if (!$file) {
+                    continue;
+                }
+                if (!in_array((int) $docId, $allowedIds, true)) {
+                    continue;
+                }
+                $storedPath = $file->store('visa_documents', 'public');
+                $visa->documents()->create([
+                    'visa_type_document_id' => (int) $docId,
+                    'file_path' => $storedPath,
+                    'file_name' => $file->getClientOriginalName(),
+                    'file_type' => $file->getClientMimeType(),
+                    'file_size' => $file->getSize(),
+                ]);
+            }
+        }
 
         return redirect()->route('visas.index')->with('success', 'Visa record updated successfully.');
     }

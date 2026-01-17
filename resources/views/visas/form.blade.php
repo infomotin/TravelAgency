@@ -78,3 +78,45 @@
         @endif
     </div>
 </div>
+@if(isset($visaTypes) && $visaTypes->isNotEmpty())
+<div class="mb-3" id="visa-type-documents">
+    <label class="form-label">Visa Type Documents</label>
+    <div class="text-muted small mb-2">Upload files as per selected visa type.</div>
+    @foreach($visaTypes as $type)
+        @php
+            $docs = $typeDocuments[$type->id] ?? collect();
+        @endphp
+        @if($docs->isNotEmpty())
+            <div class="visa-doc-group mb-2" data-visa-type="{{ $type->id }}" style="display: none;">
+                @foreach($docs as $doc)
+                    <div class="mb-2">
+                        <label class="form-label">{{ $doc->name }}</label>
+                        <input type="file" name="type_documents[{{ $doc->id }}]" class="form-control">
+                    </div>
+                @endforeach
+            </div>
+        @endif
+    @endforeach
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var selectEl = document.querySelector('select[name="visa_type_id"]');
+        if (!selectEl) return;
+        var groups = document.querySelectorAll('.visa-doc-group');
+        function updateVisaDocGroups() {
+            var val = selectEl.value;
+            groups.forEach(function (g) {
+                if (!val) {
+                    g.style.display = 'none';
+                } else if (g.getAttribute('data-visa-type') === val) {
+                    g.style.display = '';
+                } else {
+                    g.style.display = 'none';
+                }
+            });
+        }
+        selectEl.addEventListener('change', updateVisaDocGroups);
+        updateVisaDocGroups();
+    });
+</script>
+@endif
