@@ -373,6 +373,46 @@ class VisaController extends Controller
         ]);
     }
 
+    public function invoice(Visa $visa)
+    {
+        $this->authorizeVisa($visa);
+
+        $visa->load('passport');
+
+        if (!$visa->invoice_no && $visa->passport && $visa->passport->agency_id) {
+            $visa->invoice_no = $this->generateInvoiceNumber($visa->passport->agency_id);
+            $visa->invoice_date = now()->toDateString();
+            $visa->save();
+        }
+
+        return view('visas.invoice', compact('visa'));
+    }
+
+    protected function generateInvoiceNumber(int $agencyId): string
+    {
+        $today = now()->format('Ymd');
+        $prefix = 'VISA-' . $today . '-';
+
+        $lastInvoice = DB::table('visas')
+            ->join('passports', 'visas.passport_id', '=', 'passports.id')
+            ->where('passports.agency_id', $agencyId)
+            ->where('visas.invoice_no', 'like', $prefix . '%')
+            ->orderBy('visas.invoice_no', 'desc')
+            ->value('visas.invoice_no');
+
+        $nextNumber = 1;
+
+        if ($lastInvoice) {
+            $parts = explode('-', $lastInvoice);
+            $lastSeq = (int) end($parts);
+            if ($lastSeq > 0) {
+                $nextNumber = $lastSeq + 1;
+            }
+        }
+
+        return $prefix . str_pad((string) $nextNumber, 4, '0', STR_PAD_LEFT);
+    }
+
     protected function authorizeVisa(Visa $visa): void
     {
         $passport = $visa->passport;

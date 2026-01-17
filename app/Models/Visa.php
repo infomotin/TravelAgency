@@ -21,6 +21,8 @@ class Visa extends Model
         'agent_id',
         'agent_commission',
         'document_path',
+        'invoice_no',
+        'invoice_date',
     ];
 
     public function passport()

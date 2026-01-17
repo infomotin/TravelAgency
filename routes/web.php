@@ -25,6 +25,7 @@ use App\Http\Controllers\Accounting\BillController;
 use App\Http\Controllers\PassportController;
 use App\Http\Controllers\VisaController;
 use App\Http\Controllers\VisaSetupController;
+use App\Http\Controllers\TicketController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
@@ -106,10 +107,12 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('passports/{passport}/invoice', [PassportController::class, 'invoice'])->name('passports.invoice');
     Route::get('passports/{passport}/barcode', [PassportController::class, 'barcode'])->name('passports.barcode');
     Route::get('visas/report', [VisaController::class, 'report'])->name('visas.report');
+    Route::get('visas/{visa}/invoice', [VisaController::class, 'invoice'])->name('visas.invoice');
     Route::resource('visas', VisaController::class)->except('show');
     Route::get('visas/setup', [VisaSetupController::class, 'index'])->name('visas.setup');
     Route::post('visas/setup/types', [VisaSetupController::class, 'storeVisaType'])->name('visas.setup.types.store');
     Route::post('visas/setup/documents', [VisaSetupController::class, 'storeVisaTypeDocument'])->name('visas.setup.documents.store');
+    Route::resource('tickets', TicketController::class)->only(['index', 'create', 'store']);
 });
 
 Route::middleware(['auth'])->group(function () {

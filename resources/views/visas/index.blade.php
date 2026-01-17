@@ -41,6 +41,7 @@
                 </td>
                 <td>{{ number_format($visa->agent_commission, 2) }}</td>
                 <td class="text-end">
+                    <a href="{{ route('visas.invoice', $visa) }}" class="btn btn-sm btn-success">Invoice</a>
                     <a href="{{ route('visas.edit', $visa) }}" class="btn btn-sm btn-outline-primary">Edit</a>
                     <form action="{{ route('visas.destroy', $visa) }}" method="post" class="d-inline">
                         @csrf
@@ -59,4 +60,3 @@
 </div>
 {{ $visas->links() }}
 @endsection
-
